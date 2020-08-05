@@ -8,6 +8,8 @@ from skimage.filters import gaussian
 from skimage.segmentation import find_boundaries
 from torchvision.transforms import Compose
 
+import ipdb 
+
 # WARN: use fixed random state for reproducibility; if you want to randomize on each run seed with `time.time()` e.g.
 GLOBAL_RANDOM_STATE = np.random.RandomState(47)
 
@@ -90,6 +92,7 @@ class RandomRotate:
 
     def __call__(self, m):
         axis = self.axes[self.random_state.randint(len(self.axes))]
+
         angle = self.random_state.randint(-self.angle_spectrum, self.angle_spectrum)
 
         if m.ndim == 3:
@@ -148,6 +151,7 @@ class ElasticDeformation:
         self.apply_3d = apply_3d
 
     def __call__(self, m):
+        
         if self.random_state.uniform() < self.execution_probability:
             assert m.ndim in [3, 4]
 
@@ -177,7 +181,6 @@ class ElasticDeformation:
             else:
                 channels = [map_coordinates(c, indices, order=self.spline_order, mode='reflect') for c in m]
                 return np.stack(channels, axis=0)
-
         return m
 
 
@@ -308,6 +311,7 @@ class StandardLabelToBoundary:
         self.foreground = foreground
 
     def __call__(self, m):
+        
         assert m.ndim == 3
 
         boundaries = find_boundaries(m, connectivity=2, mode=self.mode)
@@ -324,6 +328,8 @@ class StandardLabelToBoundary:
         if self.append_label:
             # append original input data
             results.append(m)
+
+        kkk = np.stack(results, axis=0)
 
         return np.stack(results, axis=0)
 
@@ -676,7 +682,7 @@ class Transformer:
     def _create_transform(self, name):
         assert name in self.phase_config, f'Could not find {name} transform'
         return Compose([
-            self._create_augmentation(c) for c in self.phase_config[name]
+            self._create_augmentation(c) for c in self.phase_config[name] 
         ])
 
     def _create_augmentation(self, c):

@@ -4,27 +4,28 @@
 # Download validation data from: https://osf.io/vs6gb/
 # Download test data from: https://osf.io/tn4xj/
 
+
 eval_metric:
-  name: BoundaryAdaptedRandError
-  threshold: 0.4
-  use_first_input: true
-  use_last_target: true
+  name: MeanIoU
+  # a target label that is ignored during metric evaluation
+  ignore_index: null
 loaders:
   # class of the HDF5 dataset, currently StandardHDF5Dataset and LazyHDF5Dataset are supported.
   # When using LazyHDF5Dataset make sure to set `num_workers = 1`, due to a bug in h5py which corrupts the data
   # when reading from multiple threads.
-  dataset: LazyHDF5Dataset
+  dataset: Kits19Dataset
   label_internal_path: /label
-  batch_size: 1
-  num_workers: 1
+  batch_size: 4
+  num_workers: 4 
   raw_internal_path: /raw
+  original_data_dir: "/mnt/sda2/kits19/data/"
   train:
     file_paths:
-    - "/mnt/sda2/lightsheet_boundary/Train"
+    - "/mnt/sda2/kits19_processed/Train"
 
     slice_builder:
       name: FilterSliceBuilder
-      patch_shape: [80, 144, 144]
+      patch_shape: [32, 144, 144]
       slack_acceptance: 0.01
       stride_shape: [20, 40, 40]
       threshold: 0.6
@@ -38,11 +39,7 @@ loaders:
         name: RandomRotate
       - name: ElasticDeformation
         spline_order: 0
-      - append_label: true
-        blur: true
-        name: StandardLabelToBoundary
-        sigma: 1.0
-      - expand_dims: false
+      - expand_dims: true
         name: ToTensor
       raw:
       - name: Standardize
@@ -58,20 +55,16 @@ loaders:
         name: ToTensor
   val:
     file_paths:
-    - "/mnt/sda2/lightsheet_boundary/Val"
+    - "/mnt/sda2/kits19_processed/Val"
     slice_builder:
       name: FilterSliceBuilder
-      patch_shape: [80, 144, 144]
+      patch_shape: [32, 144, 144]
       slack_acceptance: 0.01
-      stride_shape: [80, 144, 144]
+      stride_shape: [20, 40, 40]
       threshold: 0.4
     transformer:
       label:
-      - append_label: true
-        blur: true
-        name: StandardLabelToBoundary
-        sigma: 1.0
-      - expand_dims: false
+      - expand_dims: ture 
         name: ToTensor
       raw:
       - name: Standardize
@@ -79,8 +72,8 @@ loaders:
         name: ToTensor
 loss:
   ignore_index: null
-  name: BCEDiceLoss
-  skip_last_target: true
+  name: DiceLoss
+  weight: null 
 lr_scheduler:
   factor: 0.2
   mode: min
@@ -99,10 +92,10 @@ optimizer:
   learning_rate: 0.0002
   weight_decay: 1.0e-05
 trainer:
-  checkpoint_dir: "/mnt/sda2/lightsheet_boundary/"
+  checkpoint_dir: "/mnt/sda2/kits19_processed/"
   epochs: 1000
   eval_score_higher_is_better: false
   iters: 150000
   log_after_iters: 250
   resume: null
-  validate_after_iters: 1000
+  validate_after_iters: 200

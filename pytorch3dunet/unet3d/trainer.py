@@ -8,6 +8,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from pytorch3dunet.unet3d.utils import get_logger
 from . import utils
 
+import ipdb
 logger = get_logger('UNet3DTrainer')
 
 
@@ -163,13 +164,11 @@ class UNet3DTrainer:
 
         # sets the model in training mode
         self.model.train()
-
         for i, t in enumerate(train_loader):
             logger.info(
                 f'Training iteration {self.num_iterations}. Batch {i}. Epoch [{self.num_epoch}/{self.max_num_epochs - 1}]')
-
             input, target, weight = self._split_training_batch(t)
-
+            
             output, loss = self._forward_pass(input, target, weight)
 
             train_losses.update(loss.item(), self._batch_size(input))

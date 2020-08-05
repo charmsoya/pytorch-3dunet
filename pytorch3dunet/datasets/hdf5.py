@@ -10,6 +10,7 @@ import pytorch3dunet.augment.transforms as transforms
 from pytorch3dunet.datasets.utils import get_slice_builder, ConfigDataset, calculate_stats
 from pytorch3dunet.unet3d.utils import get_logger
 
+import ipdb
 logger = get_logger('HDF5Dataset')
 lock = Lock()
 
@@ -66,7 +67,6 @@ class AbstractHDF5Dataset(ConfigDataset):
             internal_paths.extend(label_internal_path)
         if weight_internal_path is not None:
             internal_paths.extend(weight_internal_path)
-
         input_file = self.create_h5_file(file_path, internal_paths)
 
         self.raws = self.fetch_and_check(input_file, raw_internal_path)
@@ -148,8 +148,9 @@ class AbstractHDF5Dataset(ConfigDataset):
         # get the slice for a given index 'idx'
         raw_idx = self.raw_slices[idx]
         # get the raw data patch for a given slice
+        
         raw_patch_transformed = self._transform_patches(self.raws, raw_idx, self.raw_transform)
-
+        
         if self.phase == 'test':
             # discard the channel dimension in the slices: predictor requires only the spatial dimensions of the volume
             if len(raw_idx) == 4:
@@ -334,4 +335,5 @@ class LazyHDF5Dataset(AbstractHDF5Dataset):
         # they min, max, mean, std should be provided in the config
         logger.info(
             'Using LazyHDF5Dataset. Make sure that the min/max/mean/std values are provided in the loaders config')
-        return None, None, None, None
+        return 0, 255, 127, 50
+        #return None, None, None, None

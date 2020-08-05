@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import DataLoader, ConcatDataset, Dataset
 
 from pytorch3dunet.unet3d.utils import get_logger
-
+import ipdb
 logger = get_logger('Dataset')
 
 
@@ -88,6 +88,7 @@ class SliceBuilder:
             [(slice, slice, slice, slice), ...] if len(shape) == 4
             [(slice, slice, slice), ...] if len(shape) == 3
         """
+
         slices = []
         if dataset.ndim == 4:
             in_channels, i_z, i_y, i_x = dataset.shape
@@ -229,7 +230,7 @@ class RandomFilterSliceBuilder(EmbeddingsSliceBuilder):
 
 
 def _get_cls(class_name):
-    modules = ['pytorch3dunet.datasets.hdf5', 'pytorch3dunet.datasets.dsb', 'pytorch3dunet.datasets.utils']
+    modules = ['pytorch3dunet.datasets.hdf5', 'pytorch3dunet.datasets.dsb', 'pytorch3dunet.datasets.utils', 'pytorch3dunet.datasets.kits19']
     for module in modules:
         m = importlib.import_module(module)
         clazz = getattr(m, class_name, None)
@@ -273,7 +274,6 @@ def get_train_loaders(config):
     train_datasets = dataset_class.create_datasets(loaders_config, phase='train')
 
     val_datasets = dataset_class.create_datasets(loaders_config, phase='val')
-
     num_workers = loaders_config.get('num_workers', 1)
     logger.info(f'Number of workers for train/val dataloader: {num_workers}')
     batch_size = loaders_config.get('batch_size', 1)
@@ -284,6 +284,7 @@ def get_train_loaders(config):
 
     logger.info(f'Batch size for train/val loader: {batch_size}')
     # when training with volumetric data use batch_size of 1 due to GPU memory constraints
+    ipdb.set_trace()
     return {
         'train': DataLoader(ConcatDataset(train_datasets), batch_size=batch_size, shuffle=True,
                             num_workers=num_workers),
