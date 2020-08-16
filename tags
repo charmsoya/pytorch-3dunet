@@ -198,6 +198,7 @@ __init__	pytorch3dunet/datasets/utils.py	/^    def __init__(self, raw_datasets, 
 __init__	pytorch3dunet/datasets/utils.py	/^    def __init__(self, raw_datasets, label_datasets, weight_datasets, patch_shape, stride_shape,/;"	m	class:EmbeddingsSliceBuilder
 __init__	pytorch3dunet/datasets/utils.py	/^    def __init__(self, raw_datasets, label_datasets, weight_datasets, patch_shape, stride_shape,/;"	m	class:FilterSliceBuilder
 __init__	pytorch3dunet/datasets/utils.py	/^    def __init__(self, raw_datasets, label_datasets, weight_datasets, patch_shape, stride_shape,/;"	m	class:RandomFilterSliceBuilder
+__init__	pytorch3dunet/datasets/visualize.py	/^    def __init__(self):$/;"	m	class:visualizer
 __init__	pytorch3dunet/embeddings/contrastive_loss.py	/^    def __init__(self, delta_var, delta_dist, norm='fro', alpha=1., beta=1., gamma=0.001):$/;"	m	class:ContrastiveLoss
 __init__	pytorch3dunet/unet3d/buildingblocks.py	/^    def __init__(self, in_channels, out_channels, conv_kernel_size=3, apply_pooling=True,$/;"	m	class:Encoder
 __init__	pytorch3dunet/unet3d/buildingblocks.py	/^    def __init__(self, in_channels, out_channels, conv_kernel_size=3, scale_factor=(2, 2, 2), ba/;"	m	class:Decoder
@@ -334,6 +335,7 @@ assert_train_save_load	tests/test_trainer.py	/^def assert_train_save_load(tmpdir
 blur_boundary	pytorch3dunet/augment/transforms.py	/^def blur_boundary(boundary, sigma):$/;"	f
 cache_path	tests/test_bioimage-io/conftest.py	/^def cache_path(tmp_path):$/;"	f
 calculate_stats	pytorch3dunet/datasets/utils.py	/^def calculate_stats(images):$/;"	f
+class_to_color	pytorch3dunet/datasets/visualize.py	/^    def class_to_color(self, segmentation, k_color, t_color):$/;"	m	class:visualizer
 compute_per_channel_dice	pytorch3dunet/unet3d/losses.py	/^def compute_per_channel_dice(input, target, epsilon=1e-6, weight=None):$/;"	f
 config	tests/test_transforms.py	/^    config = {'dtype': 'long'}$/;"	v	class:TestTransforms
 conv3d	pytorch3dunet/unet3d/buildingblocks.py	/^def conv3d(in_channels, out_channels, kernel_size, bias, padding):$/;"	f
@@ -400,6 +402,7 @@ get_test_loaders	pytorch3dunet/datasets/utils.py	/^def get_test_loaders(config):
 get_train_loaders	pytorch3dunet/datasets/utils.py	/^def get_train_loaders(config):$/;"	f
 get_transformer	pytorch3dunet/augment/transforms.py	/^def get_transformer(config, min_value, max_value, mean, std):$/;"	f
 guess_model_path	tests/test_bioimage-io/test_packages/test_UNet3DArabidopsisOvules_model.py	/^def guess_model_path(file_names: List[str]) -> Optional[str]:$/;"	f
+hu_to_grayscale	pytorch3dunet/datasets/visualize.py	/^    def hu_to_grayscale(self, volume, hu_min, hu_max):$/;"	m	class:visualizer
 ignore_predicate	pytorch3dunet/datasets/utils.py	/^        def ignore_predicate(raw_label_idx):$/;"	f	member:EmbeddingsSliceBuilder.__init__	file:
 ignore_predicate	pytorch3dunet/datasets/utils.py	/^        def ignore_predicate(raw_label_idx):$/;"	f	member:FilterSliceBuilder.__init__	file:
 ignore_predicate	pytorch3dunet/datasets/utils.py	/^        def ignore_predicate(raw_label_idx):$/;"	f	member:RandomFilterSliceBuilder.__init__	file:
@@ -447,6 +450,7 @@ np	pytorch3dunet/datasets/dsb.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/datasets/hdf5.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/datasets/kits19.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/datasets/utils.py	/^import numpy as np$/;"	I
+np	pytorch3dunet/datasets/visualize.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/unet3d/metrics.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/unet3d/predictor.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/unet3d/seg_metrics.py	/^import numpy as np$/;"	I
@@ -460,8 +464,10 @@ np	tests/test_trainer.py	/^import numpy as np$/;"	I
 np	tests/test_transforms.py	/^import numpy as np$/;"	I
 number_of_features_per_level	pytorch3dunet/unet3d/utils.py	/^def number_of_features_per_level(init_channel_number, num_levels):$/;"	f
 optim	pytorch3dunet/train.py	/^import torch.optim as optim$/;"	I
+overlay	pytorch3dunet/datasets/visualize.py	/^    def overlay(self, volume_ims, segmentation_ims, segmentation, alpha):$/;"	m	class:visualizer
 ovule_label	tests/conftest.py	/^def ovule_label():$/;"	f
 package_bytes	tests/test_bioimage-io/test_packages/test_UNet3DArabidopsisOvules_model.py	/^def package_bytes(cache_path):$/;"	f
+plot_3d	pytorch3dunet/datasets/kits19.py	/^    def plot_3d(image, threshold=-300):$/;"	m	class:Kits19Dataset
 plot_segm	pytorch3dunet/unet3d/utils.py	/^def plot_segm(segm, ground_truth, plots_dir='.'):$/;"	f
 plt	pytorch3dunet/unet3d/utils.py	/^import matplotlib.pyplot as plt$/;"	I
 precision	pytorch3dunet/unet3d/seg_metrics.py	/^def precision(tp, fp, fn):$/;"	f
@@ -482,6 +488,7 @@ raw_transform	pytorch3dunet/augment/transforms.py	/^    def raw_transform(self):
 recall	pytorch3dunet/unet3d/seg_metrics.py	/^def recall(tp, fp, fn):$/;"	f
 remove_halo	pytorch3dunet/unet3d/utils.py	/^def remove_halo(patch, index, shape, patch_halo):$/;"	f
 required_spec_kwargs	tests/test_bioimage-io/test_manifest.py	/^def required_spec_kwargs():$/;"	f
+save	pytorch3dunet/datasets/visualize.py	/^    def save(self, vol, seg, destination):$/;"	m	class:visualizer
 save_checkpoint	pytorch3dunet/unet3d/utils.py	/^def save_checkpoint(state, is_best, checkpoint_dir, logger=None):$/;"	f
 save_network_output	pytorch3dunet/unet3d/utils.py	/^def save_network_output(output_path, output, logger=None):$/;"	f
 should_stop	pytorch3dunet/unet3d/trainer.py	/^    def should_stop(self):$/;"	m	class:UNet3DTrainer
@@ -546,5 +553,6 @@ transforms	pytorch3dunet/datasets/hdf5.py	/^import pytorch3dunet.augment.transfo
 traverse_h5_paths	pytorch3dunet/datasets/hdf5.py	/^    def traverse_h5_paths(file_paths):$/;"	m	class:AbstractHDF5Dataset
 update	pytorch3dunet/unet3d/utils.py	/^    def update(self, value, n=1):$/;"	m	class:RunningAverage
 validate	pytorch3dunet/unet3d/trainer.py	/^    def validate(self, val_loader):$/;"	m	class:UNet3DTrainer
+visualizer	pytorch3dunet/datasets/visualize.py	/^class visualizer:$/;"	c
 weight_slices	pytorch3dunet/datasets/utils.py	/^    def weight_slices(self):$/;"	m	class:SliceBuilder
 weight_transform	pytorch3dunet/augment/transforms.py	/^    def weight_transform(self):$/;"	m	class:Transformer

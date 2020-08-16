@@ -103,6 +103,7 @@ class SliceBuilder:
             for y in y_steps:
                 x_steps = SliceBuilder._gen_indices(i_x, k_x, s_x)
                 for x in x_steps:
+
                     slice_idx = (
                         slice(z, z + k_z),
                         slice(y, y + k_y),
@@ -111,6 +112,7 @@ class SliceBuilder:
                     if dataset.ndim == 4:
                         slice_idx = (slice(0, in_channels),) + slice_idx
                     slices.append(slice_idx)
+
         return slices
 
     @staticmethod
@@ -147,7 +149,7 @@ class FilterSliceBuilder(SliceBuilder):
             non_ignore_counts = np.array([np.count_nonzero(patch != ii) for ii in ignore_index])
             non_ignore_counts = non_ignore_counts / patch.size
             return np.any(non_ignore_counts > threshold) or rand_state.rand() < slack_acceptance
-
+        ipdb.set_trace()
         zipped_slices = zip(self.raw_slices, self.label_slices)
         # ignore slices containing too much ignore_index
         filtered_slices = list(filter(ignore_predicate, zipped_slices))
@@ -284,7 +286,6 @@ def get_train_loaders(config):
 
     logger.info(f'Batch size for train/val loader: {batch_size}')
     # when training with volumetric data use batch_size of 1 due to GPU memory constraints
-    ipdb.set_trace()
     return {
         'train': DataLoader(ConcatDataset(train_datasets), batch_size=batch_size, shuffle=True,
                             num_workers=num_workers),

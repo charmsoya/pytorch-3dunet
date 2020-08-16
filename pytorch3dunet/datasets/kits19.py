@@ -9,7 +9,7 @@ from pytorch3dunet.augment import transforms
 from pytorch3dunet.datasets.utils import ConfigDataset, calculate_stats
 from pytorch3dunet.unet3d.utils import get_logger
 from pytorch3dunet.datasets.hdf5 import AbstractHDF5Dataset  
-
+from pytorch3dunet.datasets.visualize import visualizer
 from scipy import ndimage
 
 import ipdb
@@ -42,21 +42,21 @@ class Kits19Dataset(AbstractHDF5Dataset):
         # exist already preprocessed data?
         files = os.listdir(cls.train_dir)
         need_processing = True 
-
-        if ( (phase == 'train' and len(files) == 200 ) or 
-           (phase == 'val' and len(files) == 10) ):
-            need_processing = False
+        
+        if (phase == 'train' and len(files) == 200 ) or \
+           (phase == 'val' and len(files) == 10) :
+             need_processing = False
 
         if phase == 'train':
             id_range = range(0, 200)
         if phase == 'val':
             id_range = range(200, 210)
-
         if need_processing:
             # deleted existed files
             for f in files:
                     os.remove(Path(cls.train_dir)/f)
             #  preprocesing each patient's data
+            save_img = visualizer()
             for case_id in id_range:
                 print(f'Preprocessing {phase} case {case_id+1}/{len(id_range)},')
                 vol, seg = cls.load_case(cls, case_id)
@@ -66,12 +66,21 @@ class Kits19Dataset(AbstractHDF5Dataset):
                 vol = vol.get_data()
                 seg = seg.get_data()
                 seg = seg.astype(np.int32)
+                
                 # resample (or re-slice) for isotropic voxel
-                new_spacing = [spacing[1],spacing[1],spacing[2]]
+                new_spacing = [1,1,1]
+
                 resize_factor = np.array(spacing) / new_spacing
-                print(f'\t resample Z spacing from {spacing[0]} to {spacing[1]}') 
-                vol = ndimage.zoom(vol, resize_factor, order=2, mode='nearest')
-                seg = ndimage.zoom(seg, resize_factor, order=2, mode='nearest')
+                new_real_shape = vol.shape * resize_factor
+                new_shape = np.round(new_real_shape)   #返回浮点数x的四舍五入值。
+                real_resize_factor = new_shape / vol.shape
+                new_spacing = spacing / real_resize_factor
+
+
+                resize_factor = np.array(spacing) / new_spacing
+                print(f'\t resample Z spacing from {spacing} to {new_spacing}') 
+                vol = ndimage.zoom(vol, resize_factor, order=0 )
+                seg = ndimage.zoom(seg, resize_factor, order=0 )
 
                 # 3D ROI, CT slices only contain masks will be preserved
                 ior_z = []
@@ -84,6 +93,10 @@ class Kits19Dataset(AbstractHDF5Dataset):
                 ior_zmax = max(ior_z)
                 vol = vol[ior_zmin:ior_zmax+1,:,:]
                 seg = seg[ior_zmin:ior_zmax+1,:,:]
+
+                # save data to disk
+                # save_img.save( vol, seg, '/mnt/sda2/kits19_processed/img/'+str(case_id))
+
                 print('\t done.')
 
                 # store as a h5d file
@@ -124,7 +137,7 @@ class Kits19Dataset(AbstractHDF5Dataset):
         # they min, max, mean, std should be provided in the config
         logger.info(
             'Using LazyHDF5Dataset. Make sure that the min/max/mean/std values are provided in the loaders config')
-        return -800, 600, 0, 100
+        return -1000, 400, None, None 
         #return None, None, None, None
     
     def load_case(self,cid):
@@ -155,5 +168,22 @@ class Kits19Dataset(AbstractHDF5Dataset):
             return vol, seg
         if (case_path/'imaging.nii.gz').exists() and not (case_path/'segmentation.nii.gz').exists():
             vol = nib.load(str(case_path / "imaging.nii.gz"))
-            return vol
-    
+            return vol 
+   
+
+    def plot_3d(image, threshold=-300):
+        # Position the scan upright,
+        # so the head of the patient would be at the top facing the camera
+        p = image.transpose(2,1,0)  #将扫描件竖直放置
+        verts, faces = measure.marching_cubes(p, threshold) #Liner推进立方体算法来查找3D体积数据中的曲面。
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection='3d')
+        # Fancy indexing: `verts[faces]` to generate a collection of triangles
+        mesh = Poly3DCollection(verts[faces], alpha=0.1)  #创建3Dpoly
+        face_color = [0.5, 0.5, 1]
+        mesh.set_facecolor(face_color)  #设置颜色
+        ax.add_collection3d(mesh)
+        ax.set_xlim(0, p.shape[0])
+        ax.set_ylim(0, p.shape[1])
+        ax.set_zlim(0, p.shape[2])
+        plt.show()
