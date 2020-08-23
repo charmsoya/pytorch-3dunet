@@ -16,7 +16,7 @@ loaders:
   dataset: Kits19Dataset
   label_internal_path: /label
   batch_size: 4
-  num_workers: 4 
+  num_workers: 1 
   raw_internal_path: /raw
   original_data_dir: "/mnt/sda2/kits19/data/"
   train:
@@ -26,7 +26,7 @@ loaders:
     slice_builder:
       name: SliceBuilder
       patch_shape: [32, 144, 144]
-      stride_shape: [20, 80, 80]
+      stride_shape: [24, 100, 100]
     transformer:
       label:
       - name: RandomFlip
@@ -35,9 +35,8 @@ loaders:
         axes: [[2, 1]]
         mode: reflect
         name: RandomRotate
-      - name: ElasticDeformation
-        spline_order: 0
-      - expand_dims: true
+      - expand_dims: false
+        dtype: long 
         name: ToTensor
       raw:
       - name: Normalize
@@ -47,8 +46,6 @@ loaders:
         axes: [[2, 1]]
         mode: reflect
         name: RandomRotate
-      - name: ElasticDeformation
-        spline_order: 3
       - expand_dims: true
         name: ToTensor
   val:
@@ -57,10 +54,11 @@ loaders:
     slice_builder:
       name: SliceBuilder
       patch_shape: [32, 144, 144]
-      stride_shape: [20, 80, 80]
+      stride_shape: [24, 100, 100]
     transformer:
       label:
-      - expand_dims: true 
+      - expand_dims: false
+        dtype: long 
         name: ToTensor
       raw:
       - name: Normalize
@@ -68,22 +66,22 @@ loaders:
         name: ToTensor
 loss:
   ignore_index: null
-  name: DiceLoss
-  weight: null 
+  name: PixelWiseCrossEntropyLoss
+  weights: [1,1,1] 
 lr_scheduler:
   factor: 0.2
   mode: min
   name: ReduceLROnPlateau
-  patience: 15
+  patience: 25 
 manual_seed: 0
 model:
   f_maps: 32
-  final_sigmoid: true
+  final_sigmoid: false 
   in_channels: 1
   layer_order: gcr
   name: UNet3D
   num_groups: 8
-  out_channels: 1
+  out_channels: 3 
   is_segmentation: true
 optimizer:
   learning_rate: 0.0002
@@ -92,7 +90,7 @@ trainer:
   checkpoint_dir: "/mnt/sda2/kits19_processed/"
   epochs: 1000
   eval_score_higher_is_better: false
-  iters: 150000
-  log_after_iters: 250
+  iters: 1.5e+06
+  log_after_iters: 1000
   resume: null
-  validate_after_iters: 200
+  validate_after_iters: 1000

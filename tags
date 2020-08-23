@@ -66,6 +66,7 @@ Installation	README.md	/^## Installation$/;"	s	chapter:pytorch-3dunet
 Installation tips	README.md	/^### Installation tips$/;"	S	section:pytorch-3dunet""Installation
 InverseAngularError	pytorch3dunet/unet3d/metrics.py	/^class InverseAngularError:$/;"	c
 Kits19Dataset	pytorch3dunet/datasets/kits19.py	/^class Kits19Dataset(AbstractHDF5Dataset):$/;"	c
+LabelCheck	pytorch3dunet/augment/transforms.py	/^class LabelCheck:$/;"	c
 LabelToAffinities	pytorch3dunet/augment/transforms.py	/^class LabelToAffinities(AbstractLabelToBoundary):$/;"	c
 LabelToBoundaryAndAffinities	pytorch3dunet/augment/transforms.py	/^class LabelToBoundaryAndAffinities:$/;"	c
 LabelToMaskAndAffinities	pytorch3dunet/augment/transforms.py	/^class LabelToMaskAndAffinities:$/;"	c
@@ -140,6 +141,7 @@ __call__	pytorch3dunet/augment/transforms.py	/^    def __call__(self, m):$/;"	m	
 __call__	pytorch3dunet/augment/transforms.py	/^    def __call__(self, m):$/;"	m	class:ElasticDeformation
 __call__	pytorch3dunet/augment/transforms.py	/^    def __call__(self, m):$/;"	m	class:FlyWingBoundary
 __call__	pytorch3dunet/augment/transforms.py	/^    def __call__(self, m):$/;"	m	class:Identity
+__call__	pytorch3dunet/augment/transforms.py	/^    def __call__(self, m):$/;"	m	class:LabelCheck
 __call__	pytorch3dunet/augment/transforms.py	/^    def __call__(self, m):$/;"	m	class:LabelToBoundaryAndAffinities
 __call__	pytorch3dunet/augment/transforms.py	/^    def __call__(self, m):$/;"	m	class:LabelToMaskAndAffinities
 __call__	pytorch3dunet/augment/transforms.py	/^    def __call__(self, m):$/;"	m	class:Normalize
@@ -166,6 +168,7 @@ __getitem__	pytorch3dunet/datasets/dsb.py	/^    def __getitem__(self, idx):$/;"	
 __getitem__	pytorch3dunet/datasets/hdf5.py	/^    def __getitem__(self, idx):$/;"	m	class:AbstractHDF5Dataset
 __getitem__	pytorch3dunet/datasets/utils.py	/^    def __getitem__(self, index):$/;"	m	class:ConfigDataset
 __init__	pytorch3dunet/augment/transforms.py	/^    def __init__(self, **kwargs):$/;"	m	class:Identity
+__init__	pytorch3dunet/augment/transforms.py	/^    def __init__(self, **kwargs):$/;"	m	class:LabelCheck
 __init__	pytorch3dunet/augment/transforms.py	/^    def __init__(self, **kwargs):$/;"	m	class:Relabel
 __init__	pytorch3dunet/augment/transforms.py	/^    def __init__(self, append_label=False, boundary=False, cross_entropy=False, **kwargs):$/;"	m	class:BlobsToMask
 __init__	pytorch3dunet/augment/transforms.py	/^    def __init__(self, append_label=False, thick_boundary=True, ignore_index=None, z_offsets=Non/;"	m	class:FlyWingBoundary
@@ -382,7 +385,7 @@ forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target):$/
 forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target):$/;"	m	class:WeightedSmoothL1Loss
 forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target):$/;"	m	class:_AbstractDiceLoss
 forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target):$/;"	m	class:_MaskingLossWrapper
-forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target, weights):$/;"	m	class:PixelWiseCrossEntropyLoss
+forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target, weights=None):$/;"	m	class:PixelWiseCrossEntropyLoss
 forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, inputs, targets, weight):$/;"	m	class:TagsAngularLoss
 forward	pytorch3dunet/unet3d/model.py	/^    def forward(self, x):$/;"	m	class:Abstract3DUNet
 from_checkpoint	pytorch3dunet/unet3d/trainer.py	/^    def from_checkpoint(cls, checkpoint_path, model, optimizer, lr_scheduler, loss_criterion, ev/;"	m	class:UNet3DTrainer

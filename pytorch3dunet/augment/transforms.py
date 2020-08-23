@@ -299,7 +299,6 @@ class AbstractLabelToBoundary:
     def get_kernels(self):
         raise NotImplementedError
 
-
 class StandardLabelToBoundary:
     def __init__(self, ignore_index=None, append_label=False, blur=False, sigma=1, mode='thick', foreground=False,
                  **kwargs):
@@ -628,6 +627,13 @@ class ToTensor:
 
         return torch.from_numpy(m.astype(dtype=self.dtype))
 
+class LabelCheck:
+    def __init__(self, **kwargs):
+        print('label check')
+    def __call__(self, m):
+       unique_list = np.unique(m)
+       assert( all( [ element in (0,1,2) for element in unique_list] ))
+       return m
 
 class Relabel:
     """

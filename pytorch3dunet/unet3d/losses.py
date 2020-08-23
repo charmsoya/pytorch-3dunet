@@ -7,7 +7,7 @@ from torch.nn import MSELoss, SmoothL1Loss, L1Loss
 from pytorch3dunet.embeddings.contrastive_loss import ContrastiveLoss
 from pytorch3dunet.unet3d.utils import expand_as_one_hot
 
-
+import ipdb
 def compute_per_channel_dice(input, target, epsilon=1e-6, weight=None):
     """
     Computes DiceCoefficient as defined in https://arxiv.org/abs/1606.04797 given  a multi channel input and target.
@@ -207,14 +207,15 @@ class PixelWiseCrossEntropyLoss(nn.Module):
         self.ignore_index = ignore_index
         self.log_softmax = nn.LogSoftmax(dim=1)
 
-    def forward(self, input, target, weights):
+    def forward(self, input, target, weights=None):
+        weights = torch.ones(target.size()).cuda() #TODO 临时编写
         assert target.size() == weights.size()
         # normalize the input
         log_probabilities = self.log_softmax(input)
         # standard CrossEntropyLoss requires the target to be (NxDxHxW), so we need to expand it to (NxCxDxHxW)
         target = expand_as_one_hot(target, C=input.size()[1], ignore_index=self.ignore_index)
         # expand weights
-        weights = weights.unsqueeze(0)
+        weights = weights.unsqueeze(1)  #TODO 0已经被修改1
         weights = weights.expand_as(input)
 
         # create default class_weights if None
@@ -323,7 +324,6 @@ def get_loss_criterion(config):
     assert 'loss' in config, 'Could not find loss function configuration'
     loss_config = config['loss']
     name = loss_config.pop('name')
-
     ignore_index = loss_config.pop('ignore_index', None)
     skip_last_target = loss_config.pop('skip_last_target', False)
     weight = loss_config.pop('weight', None)

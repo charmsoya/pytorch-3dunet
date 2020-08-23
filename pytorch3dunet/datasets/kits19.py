@@ -44,13 +44,17 @@ class Kits19Dataset(AbstractHDF5Dataset):
         need_processing = True 
         
         if (phase == 'train' and len(files) == 200 ) or \
-           (phase == 'val' and len(files) == 10) :
+           (phase == 'val' and len(files) == 10) or \
+           (phase == 'test' and len(files) == 90):
              need_processing = False
 
         if phase == 'train':
             id_range = range(0, 200)
         if phase == 'val':
             id_range = range(200, 210)
+        if phase == 'test':
+            id_range = range(210, 300)
+        
         if need_processing:
             # deleted existed files
             for f in files:
@@ -68,19 +72,20 @@ class Kits19Dataset(AbstractHDF5Dataset):
                 seg = seg.astype(np.int32)
                 
                 # resample (or re-slice) for isotropic voxel
-                new_spacing = [1,1,1]
+                new_spacing = [2,2,2]
 
                 resize_factor = np.array(spacing) / new_spacing
                 new_real_shape = vol.shape * resize_factor
-                new_shape = np.round(new_real_shape)   #返回浮点数x的四舍五入值。
+                new_shape = np.round(new_real_shape)   
                 real_resize_factor = new_shape / vol.shape
                 new_spacing = spacing / real_resize_factor
 
 
                 resize_factor = np.array(spacing) / new_spacing
+                print(f'\t original shape: {vol.shape}')
                 print(f'\t resample Z spacing from {spacing} to {new_spacing}') 
-                vol = ndimage.zoom(vol, resize_factor, order=0 )
-                seg = ndimage.zoom(seg, resize_factor, order=0 )
+                vol = ndimage.zoom(vol, resize_factor, order=1 )
+                seg = ndimage.zoom(seg, resize_factor, order=1 )
 
                 # 3D ROI, CT slices only contain masks will be preserved
                 ior_z = []
@@ -96,7 +101,7 @@ class Kits19Dataset(AbstractHDF5Dataset):
 
                 # save data to disk
                 # save_img.save( vol, seg, '/mnt/sda2/kits19_processed/img/'+str(case_id))
-
+                print(f'\t new shape: {vol.shape}')
                 print('\t done.')
 
                 # store as a h5d file

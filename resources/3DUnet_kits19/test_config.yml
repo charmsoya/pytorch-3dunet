@@ -1,6 +1,7 @@
 # Download test data from: https://osf.io/tn4xj/
 
 loaders:
+  dataset: Kits19Dataset
   batch_size: 1
   mirror_padding:
   - 16
@@ -8,24 +9,25 @@ loaders:
   - 32
   num_workers: 8
   # directory where the output from the model will be saved
-  output_dir: "/home/adrian/Datasets/LateralRoot/predictions"
+  output_dir: "/mnt/sda2/kits19_result"
+  original_data_dir: "/mnt/sda2/kits19/data"
   raw_internal_path: raw
   test:
     file_paths:
-    - "/home/adrian/Datasets/LateralRoot/Test"
+    - "/mnt/sda2/kits19_processed/Test"
     slice_builder:
       name: SliceBuilder
       patch_shape:
-      - 80
+      - 32
       - 144
       - 144
       stride_shape:
-      - 40
-      - 90
-      - 90
+      - 20 
+      - 80
+      - 80
     transformer:
       raw:
-      - name: Standardize
+      - name: Normalize
       - expand_dims: true
         name: ToTensor
 manual_seed: 0
@@ -35,9 +37,9 @@ model:
   in_channels: 1
   is_segmentation: true
   layer_order: gcr
-  name: ResidualUNet3D
+  name: UNet3D
   num_groups: 8
   out_channels: 1
-model_path: "/home/adrian/Datasets/LateralRoot/best_checkpoint.pytorch"
+model_path: "/mnt/sda2/kits19_processed/best_checkpoint.pytorch"
 predictor:
   name: StandardPredictor

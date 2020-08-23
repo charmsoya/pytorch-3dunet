@@ -202,8 +202,8 @@ class UNet3DTrainer:
             if self.num_iterations % self.log_after_iters == 0:
                 # if model contains final_activation layer for normalizing logits apply it, otherwise both
                 # the evaluation metric as well as images in tensorboard will be incorrectly computed
-                if hasattr(self.model, 'final_activation') and self.model.final_activation is not None:
-                    output = self.model.final_activation(output)
+                #if hasattr(self.model, 'final_activation') and self.model.final_activation is not None:
+                #    output = self.model.final_activation(output)
 
                 # compute eval criterion
                 if not self.skip_train_validation:
@@ -258,8 +258,8 @@ class UNet3DTrainer:
 
                 # if model contains final_activation layer for normalizing logits apply it, otherwise
                 # the evaluation metric will be incorrectly computed
-                if hasattr(self.model, 'final_activation') and self.model.final_activation is not None:
-                    output = self.model.final_activation(output)
+                #if hasattr(self.model, 'final_activation') and self.model.final_activation is not None:
+                #    output = self.model.final_activation(output)
 
                 if i % 100 == 0:
                     self._log_images(input, target, output, 'val_')
