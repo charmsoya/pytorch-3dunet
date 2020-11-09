@@ -21,6 +21,7 @@ def compute_per_channel_dice(input, target, epsilon=1e-6, weight=None):
     """
 
     # input and target shapes must match
+    target = expand_as_one_hot( target, input.size()[1])
     assert input.size() == target.size(), "'input' and 'target' must have the same shape"
 
     input = flatten(input)
@@ -127,6 +128,13 @@ class DiceLoss(_AbstractDiceLoss):
     def dice(self, input, target, weight):
         return compute_per_channel_dice(input, target, weight=self.weight)
 
+class ComboLoss(nn.Module):
+    def __init__(self, class_weight=None, sigmoid_normalization=True, ignore_index = None):
+        super(ComboLoss, self).__init__()
+        self.dice_loss = DiceLoss( weight = class_weight, sigmoid_normalization = sigmoid_normalization)
+        self.pixel_wise_cross_entropy = PixelWiseCrossEntropyLoss( class_weight, ignore_index )
+    def forward(self, input, target, weights):
+        return  self.dice_loss(input, target) + self.pixel_wise_cross_entropy(input, target, weights)
 
 class GeneralizedDiceLoss(_AbstractDiceLoss):
     """Computes Generalized Dice Loss (GDL) as described in https://arxiv.org/pdf/1707.03237.pdf.
@@ -137,6 +145,7 @@ class GeneralizedDiceLoss(_AbstractDiceLoss):
         self.epsilon = epsilon
 
     def dice(self, input, target, weight):
+        ipdb.set_trace()
         assert input.size() == target.size(), "'input' and 'target' must have the same shape"
 
         input = flatten(input)
@@ -208,14 +217,13 @@ class PixelWiseCrossEntropyLoss(nn.Module):
         self.log_softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, input, target, weights=None):
-        weights = torch.ones(target.size()).cuda() #TODO 临时编写
         assert target.size() == weights.size()
         # normalize the input
         log_probabilities = self.log_softmax(input)
         # standard CrossEntropyLoss requires the target to be (NxDxHxW), so we need to expand it to (NxCxDxHxW)
         target = expand_as_one_hot(target, C=input.size()[1], ignore_index=self.ignore_index)
         # expand weights
-        weights = weights.unsqueeze(1)  #TODO 0已经被修改1
+        weights = weights.unsqueeze( 1 ) 
         weights = weights.expand_as(input)
 
         # create default class_weights if None
@@ -350,7 +358,7 @@ def get_loss_criterion(config):
 
 
 SUPPORTED_LOSSES = ['BCEWithLogitsLoss', 'BCEDiceLoss', 'CrossEntropyLoss', 'WeightedCrossEntropyLoss',
-                    'PixelWiseCrossEntropyLoss', 'GeneralizedDiceLoss', 'DiceLoss', 'TagsAngularLoss', 'MSELoss',
+                    'PixelWiseCrossEntropyLoss', 'GeneralizedDiceLoss', 'DiceLoss', 'ComboLoss', 'TagsAngularLoss', 'MSELoss',
                     'SmoothL1Loss', 'L1Loss', 'WeightedSmoothL1Loss']
 
 
@@ -369,6 +377,10 @@ def _create_loss(name, loss_config, weight, ignore_index, pos_weight):
         if ignore_index is None:
             ignore_index = -100  # use the default 'ignore_index' as defined in the CrossEntropyLoss
         return WeightedCrossEntropyLoss(ignore_index=ignore_index)
+    elif name == 'ComboLoss':
+        if ignore_index is None:
+            ignore_index = -100
+        return ComboLoss(class_weight = weight, ignore_index = ignore_index)
     elif name == 'PixelWiseCrossEntropyLoss':
         return PixelWiseCrossEntropyLoss(class_weights=weight, ignore_index=ignore_index)
     elif name == 'GeneralizedDiceLoss':

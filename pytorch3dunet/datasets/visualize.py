@@ -1,4 +1,6 @@
 from pathlib import Path
+import os 
+
 import imageio
 import numpy as np
 
@@ -11,13 +13,16 @@ class visualizer:
      
         .
     """
-    def __init__(self):
+    def __init__(self, vol_folder = None, seg_folder = None):
         # Constants
         self.label_color =[ [0, 255, 0], [255, 0, 0], [0, 0, 255], [255, 165, 0 ] ]
         self.hu_max = 512
         self.hu_min = -512
-        self.overlay_alpha = 0.3
+        self.overlay_alpha = 0.4
         self.plane = "axial"
+        # File folder
+        self.vol_folder = vol_folder 
+        self.seg_folder = seg_folder
 
     def hu_to_grayscale(self, volume, hu_min, hu_max):
         # Clip at max and min values if specified
@@ -57,7 +62,28 @@ class visualizer:
         )
         return overlayed
 
-
+    def save_predict_cases(self, destination):
+        vol_files = sorted(os.listdir(self.vol_folder))
+        seg_files = sorted(os.listdir(self.seg_folder))
+        assert len(vol_files) == len(seg_files), 'Num.of data volum is not equal to Num. of mask segmentation'
+        for vol_file_name, seg_file_name in zip(vol_files, seg_files   ):
+            vol = h5py.File( Path(self.vol_folder)/vol_file_name, 'r' )['raw'][()]
+            seg = h5py.File( Path(self.seg_folder)/seg_file_name, 'r' )['predictions'][()]
+            case_dir = Path(destination)/vol_file_name[5:10]
+            if case_dir.is_dir() == False: 
+               case_dir.mkdir()
+            print('saving prediction result:' + vol_file_name + ' & ' + seg_file_name + ' to ' + str(case_dir) )
+            self.save(vol, seg, case_dir)
+    def save_train_cases(self, destination):
+        files = sorted(os.listdir(self.vol_folder))
+        for file_name in files:
+            vol = h5py.File( Path(self.vol_folder)/file_name, 'r' )['raw'][()]
+            seg = h5py.File( Path(self.vol_folder)/file_name, 'r' )['label'][()]
+            case_dir = Path(destination)/file_name[5:10]
+            if case_dir.is_dir() == False: 
+               case_dir.mkdir()
+            print('saving labeled train file:' + file_name + ' to ' + str(case_dir) )
+            self.save(vol, seg, case_dir)       
     def save(self, vol, seg, destination):
 
         plane = self.plane.lower()

@@ -12,7 +12,7 @@ from sklearn.cluster import MeanShift
 from pytorch3dunet.unet3d.losses import compute_per_channel_dice
 from pytorch3dunet.unet3d.seg_metrics import AveragePrecision, Accuracy
 from pytorch3dunet.unet3d.utils import get_logger, expand_as_one_hot, plot_segm, convert_to_numpy
-
+import ipdb
 logger = get_logger('EvalMetric')
 
 
@@ -84,9 +84,8 @@ class MeanIoU:
 
             assert per_channel_iou, "All channels were ignored from the computation"
             mean_iou = torch.mean(torch.tensor(per_channel_iou))
-            per_batch_iou.append(mean_iou)
-
-        return torch.mean(torch.tensor(per_batch_iou))
+            per_batch_iou.append(per_channel_iou)
+        return torch.mean(torch.tensor(per_batch_iou), axis = 0)
 
     def _binarize_predictions(self, input, n_classes):
         """

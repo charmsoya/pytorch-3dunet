@@ -168,9 +168,8 @@ class UNet3DTrainer:
             logger.info(
                 f'Training iteration {self.num_iterations}. Batch {i}. Epoch [{self.num_epoch}/{self.max_num_epochs - 1}]')
             input, target, weight = self._split_training_batch(t)
-            
-            output, loss = self._forward_pass(input, target, weight)
 
+            output, loss = self._forward_pass(input, target, weight)
             train_losses.update(loss.item(), self._batch_size(input))
 
             # compute gradients and update parameters
@@ -188,13 +187,13 @@ class UNet3DTrainer:
 
                 # adjust learning rate if necessary
                 if isinstance(self.scheduler, ReduceLROnPlateau):
-                    self.scheduler.step(eval_score)
+                    self.scheduler.step(eval_score[1])
                 else:
                     self.scheduler.step()
                 # log current learning rate in tensorboard
                 self._log_lr()
                 # remember best validation metric
-                is_best = self._is_best_eval_score(eval_score)
+                is_best = self._is_best_eval_score(eval_score[1])
 
                 # save checkpoint
                 self._save_checkpoint(is_best)
@@ -202,18 +201,18 @@ class UNet3DTrainer:
             if self.num_iterations % self.log_after_iters == 0:
                 # if model contains final_activation layer for normalizing logits apply it, otherwise both
                 # the evaluation metric as well as images in tensorboard will be incorrectly computed
-                #if hasattr(self.model, 'final_activation') and self.model.final_activation is not None:
-                #    output = self.model.final_activation(output)
+                if hasattr(self.model, 'final_activation') and self.model.final_activation is not None:
+                    output = self.model.final_activation(output)
 
                 # compute eval criterion
                 if not self.skip_train_validation:
                     eval_score = self.eval_criterion(output, target)
-                    train_eval_scores.update(eval_score.item(), self._batch_size(input))
+                    train_eval_scores.update(eval_score.numpy(), self._batch_size(input))
 
                 # log stats, params and images
                 logger.info(
                     f'Training stats. Loss: {train_losses.avg}. Evaluation score: {train_eval_scores.avg}')
-                self._log_stats('train', train_losses.avg, train_eval_scores.avg)
+                self._log_stats('train', [train_losses.avg], train_eval_scores.avg)
                 self._log_params()
                 self._log_images(input, target, output, 'train_')
 
@@ -258,20 +257,20 @@ class UNet3DTrainer:
 
                 # if model contains final_activation layer for normalizing logits apply it, otherwise
                 # the evaluation metric will be incorrectly computed
-                #if hasattr(self.model, 'final_activation') and self.model.final_activation is not None:
-                #    output = self.model.final_activation(output)
+                if hasattr(self.model, 'final_activation') and self.model.final_activation is not None:
+                    output = self.model.final_activation(output)
 
                 if i % 100 == 0:
                     self._log_images(input, target, output, 'val_')
 
                 eval_score = self.eval_criterion(output, target)
-                val_scores.update(eval_score.item(), self._batch_size(input))
+                val_scores.update(eval_score.numpy(), self._batch_size(input))
 
                 if self.validate_iters is not None and self.validate_iters <= i:
                     # stop validation
                     break
 
-            self._log_stats('val', val_losses.avg, val_scores.avg)
+            self._log_stats('val', [val_losses.avg], val_scores.avg)
             logger.info(f'Validation finished. Loss: {val_losses.avg}. Evaluation score: {val_scores.avg}')
             return val_scores.avg
 
@@ -349,7 +348,13 @@ class UNet3DTrainer:
         }
 
         for tag, value in tag_value.items():
-            self.writer.add_scalar(tag, value, self.num_iterations)
+            if len(value)>1:
+                value_dict = {}
+                for i in range(len(value)):
+                    value_dict[tag+'_class'+str(i)] = value[i]
+                self.writer.add_scalars(tag, value_dict, self.num_iterations)
+            else:
+                self.writer.add_scalar(tag, value, self.num_iterations)
 
     def _log_params(self):
         logger.info('Logging model parameters and gradients')

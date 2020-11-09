@@ -10,7 +10,7 @@ from sklearn.cluster import MeanShift
 from pytorch3dunet.datasets.utils import SliceBuilder
 from pytorch3dunet.unet3d.utils import get_logger
 from pytorch3dunet.unet3d.utils import remove_halo
-
+import ipdb
 logger = get_logger('UNet3DPredictor')
 
 
@@ -40,6 +40,7 @@ class _AbstractPredictor:
 
     def predict(self):
         raise NotImplementedError
+
 
 
 class StandardPredictor(_AbstractPredictor):
@@ -177,6 +178,7 @@ class StandardPredictor(_AbstractPredictor):
                 prediction_map = prediction_map[:, z_s, y_s, x_s]
 
             logger.info(f'Saving predictions to: {self.output_file}/{prediction_dataset}...')
+
             output_file.create_dataset(prediction_dataset, data=prediction_map, compression="gzip")
 
     @staticmethod
@@ -189,6 +191,34 @@ class StandardPredictor(_AbstractPredictor):
         assert np.all(
             patch_overlap - patch_halo >= 0), f"Not enough patch overlap for stride: {stride} and halo: {patch_halo}"
 
+class StandardPredictorWithResample(StandardPredictor):
+
+    def __init__(self, model, loader, output_file, config, **kwargs):
+        super().__init__(model, loader, output_file, config, **kwargs)
+
+    def _save_results(self, prediction_maps, normalization_masks, output_heads, output_file, dataset):
+        def _slice_from_pad(pad):
+            if pad == 0:
+                return slice(None, None)
+            else:
+                return slice(pad, -pad)
+
+        # save probability maps
+        prediction_datasets = self._get_output_dataset_names(output_heads, prefix='predictions')
+        for prediction_map, normalization_mask, prediction_dataset in zip(prediction_maps, normalization_masks,
+                                                                          prediction_datasets):
+            prediction_map = prediction_map / normalization_mask
+
+            if dataset.mirror_padding is not None:
+                z_s, y_s, x_s = [_slice_from_pad(p) for p in dataset.mirror_padding]
+
+                logger.info(f'Dataset loaded with mirror padding: {dataset.mirror_padding}. Cropping before saving...')
+
+                prediction_map = prediction_map[:, z_s, y_s, x_s]
+
+            logger.info(f'Saving predictions to: {self.output_file}/{prediction_dataset}...')
+
+            output_file.create_dataset(prediction_dataset, data=np.argmax(prediction_map,axis=0), compression="gzip")
 
 class LazyPredictor(StandardPredictor):
     """

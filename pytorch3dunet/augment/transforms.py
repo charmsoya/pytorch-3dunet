@@ -59,7 +59,6 @@ class RandomRotate90:
 
     def __call__(self, m):
         assert m.ndim in [3, 4], 'Supports only 3D (DxHxW) or 4D (CxDxHxW) images'
-
         # pick number of rotations at random
         k = self.random_state.randint(0, 4)
         # rotate k times around a given plane
@@ -560,9 +559,11 @@ class Standardize:
     def __init__(self, mean, std, eps=1e-6, **kwargs):
         self.mean = mean
         self.std = std
-        self.eps = eps
-
+        self.eps = eps 
+        self.max = kwargs['max_value']
+        self.min = kwargs['min_value']
     def __call__(self, m):
+        m = np.clip(m, a_min = self.min, a_max = self.max) 
         return (m - self.mean) / np.clip(self.std, a_min=self.eps, a_max=None)
 
 

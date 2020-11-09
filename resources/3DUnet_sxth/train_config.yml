@@ -13,21 +13,21 @@ loaders:
   # class of the HDF5 dataset, currently StandardHDF5Dataset and LazyHDF5Dataset are supported.
   # When using LazyHDF5Dataset make sure to set `num_workers = 1`, due to a bug in h5py which corrupts the data
   # when reading from multiple threads.
-  dataset: Kits19Dataset
+  dataset: SXTHDataset
   label_internal_path: /label
   weight_internal_path: /weight
-  batch_size: 4 
+  batch_size: 2 
   num_workers: 1 
   raw_internal_path: /raw
-  original_data_dir: "/mnt/sda2/kits19/data/"
+  original_data_dir: "/mnt/sda2/sxth_data/"
   train:
     file_paths:
-    - "/mnt/sda2/kits19_processed/Train"
+    - "/mnt/sda2/sxth_processed/Train"
 
     slice_builder:
       name: SliceBuilder
-      patch_shape: [53, 103, 128]
-      stride_shape: [45, 90, 110]
+      patch_shape: [24, 200, 200]
+      stride_shape: [20, 180, 180]
     transformer:
       label:
       - name: RandomFlip
@@ -48,7 +48,7 @@ loaders:
         dtype: long 
         name: ToTensor
       raw:
-      - name: Standardize
+      - name: Normalize
       - name: RandomFlip
       - angle_spectrum: 20
         axes: [[2, 1]]
@@ -58,11 +58,11 @@ loaders:
         name: ToTensor
   val:
     file_paths:
-    - "/mnt/sda2/kits19_processed/Val"
+    - "/mnt/sda2/sxth_processed/Val"
     slice_builder:
       name: SliceBuilder
-      patch_shape: [53, 103, 128]
-      stride_shape: [45, 90, 110]
+      patch_shape: [24, 200, 200]
+      stride_shape: [20, 180, 180]
     transformer:
       label:
       - expand_dims: false
@@ -73,7 +73,7 @@ loaders:
         dtype: long 
         name: ToTensor
       raw:
-      - name: Standardize
+      - name: Normalize 
       - expand_dims: true
         name: ToTensor
 loss:
@@ -94,16 +94,16 @@ model:
   name: UNet3D
   num_groups: 16 
   num_levels: 5 
-  out_channels: 3 
+  out_channels: 2 
   is_segmentation: true
 optimizer:
   learning_rate: 0.0002
   weight_decay: 1.0e-05
 trainer:
-  checkpoint_dir: "/mnt/sda2/kits19_processed/"
+  checkpoint_dir: "/mnt/sda2/sxth_processed/"
   epochs: 1000
   eval_score_higher_is_better: false
   iters: 1.5e+06
   log_after_iters: 100
-  resume: null #"/mnt/sda2/kits19_processed/last_checkpoint.pytorch"
+  resume: null #"/mnt/sda2/sxth_processed/last_checkpoint.pytorch"
   validate_after_iters: 1000

@@ -12,7 +12,7 @@ import numpy as np
 import torch
 from PIL import Image
 from sklearn.decomposition import PCA
-
+import ipdb
 plt.ioff()
 plt.switch_backend('agg')
 
@@ -352,7 +352,6 @@ def expand_as_one_hot(input, C, ignore_index=None):
     :return: 5D output image (NxCxDxHxW)
     """
     assert input.dim() == 4
-
     # expand the input tensor to Nx1xDxHxW before scattering
     input = input.unsqueeze(1)
     # create result tensor shape (NxCxDxHxW)

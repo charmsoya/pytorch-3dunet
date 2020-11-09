@@ -157,7 +157,6 @@ class UNet3D(Abstract3DUNet):
                                      num_groups=num_groups, num_levels=num_levels, is_segmentation=is_segmentation,
                                      conv_padding=conv_padding, **kwargs)
 
-
 class ResidualUNet3D(Abstract3DUNet):
     """
     Residual 3DUnet model implementation based on https://arxiv.org/pdf/1706.00120.pdf.

@@ -232,7 +232,7 @@ class RandomFilterSliceBuilder(EmbeddingsSliceBuilder):
 
 
 def _get_cls(class_name):
-    modules = ['pytorch3dunet.datasets.hdf5', 'pytorch3dunet.datasets.dsb', 'pytorch3dunet.datasets.utils', 'pytorch3dunet.datasets.kits19']
+    modules = ['pytorch3dunet.datasets.hdf5', 'pytorch3dunet.datasets.dsb', 'pytorch3dunet.datasets.utils', 'pytorch3dunet.datasets.kits19', 'pytorch3dunet.datasets.sxth']
     for module in modules:
         m = importlib.import_module(module)
         clazz = getattr(m, class_name, None)
@@ -287,8 +287,7 @@ def get_train_loaders(config):
     logger.info(f'Batch size for train/val loader: {batch_size}')
     # when training with volumetric data use batch_size of 1 due to GPU memory constraints
     return {
-        'train': DataLoader(ConcatDataset(train_datasets), batch_size=batch_size, shuffle=True,
-                            num_workers=num_workers),
+        'train': DataLoader(ConcatDataset(train_datasets), batch_size=batch_size, shuffle=True, num_workers=num_workers),
         'val': DataLoader(ConcatDataset(val_datasets), batch_size=batch_size, shuffle=True, num_workers=num_workers)
     }
 
@@ -355,3 +354,72 @@ def calculate_stats(images):
         [img.ravel() for img in images]
     )
     return np.min(flat), np.max(flat), np.mean(flat), np.std(flat)
+
+
+
+class Incre_std_avg_max_min():
+    '''
+    incrementally compute mean, standard deviation, max, min value of mass data
+    1.数据
+    obj.avg  mean value
+    obj.std  standard deviation
+    obj.n    number of data
+    对象初始化时需要指定历史平均值,历史标准差和历史数据个数(初始数据集为空则可不填写)
+    2.方法
+    obj.incre_in_list()方法传入一个待计算的数据list,进行增量计算,获得新的avg,std和n(海量数据请循环使用该方法)
+    obj.incre_in_value()方法传入一个待计算的新数据,进行增量计算,获得新的avg,std和n(海量数据请将每个新参数循环带入该方法)
+    '''
+
+    def __init__(self, h_avg=0, h_std=0, h_max=float('-inf'), h_min=float('inf'), n=0):
+        self.avg = h_avg
+        self.std = h_std
+        self.max = h_max
+        self.min = h_min
+        self.n = n
+
+    def incre_in_list(self, new_list):
+        avg_new = np.mean(new_list)
+        incre_avg = (self.n*self.avg+len(new_list)*avg_new) / \
+            (self.n+len(new_list))
+        std_new = np.std(new_list, ddof=1)
+        incre_std = np.sqrt((self.n*(self.std**2+(incre_avg-self.avg)**2)+len(new_list)
+                                * (std_new**2+(incre_avg-avg_new)**2))/(self.n+len(new_list)))
+
+        max_new = np.max(new_list)
+        incre_max =  max_new if max_new > self.max else self.max 
+
+        min_new = np.min(new_list)
+        incre_min = min_new if min_new < self.min else self.min
+
+        self.avg = incre_avg
+        self.std = incre_std
+        self.max = incre_max
+        self.min = incre_min
+        self.n += len(new_list)
+        print(f'\t Now mean={self.avg}, std={self.std}, max={self.max}, min={self.min}')
+    def incre_in_value(self, value):
+        incre_avg = (self.n*self.avg+value)/(self.n+1)
+        incre_std = np.sqrt((self.n*(self.std**2+(incre_avg-self.avg)
+                                        ** 2)+(incre_avg-value)**2)/(self.n+1))
+        incre_max =  value if value > self.max else self.max 
+        incre_min = value if value  < self.min else self.min
+        
+        self.avg = incre_avg
+        self.std = incre_std
+        self.max = incre_max
+        self.min = incre_min      
+        self.n += 1
+
+'''
+if __name__ == "__main__":
+    c = incre_std_avg()
+    c.incre_in_value(0.05)
+    print c.avg
+    print c.std
+    print c.n
+    c.incre_in_value(0.02)
+    c.incre_in_list([0.5, 0.2, 0.3])
+    print c.avg
+    print c.std
+    print c.n
+'''

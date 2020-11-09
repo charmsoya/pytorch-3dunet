@@ -3,7 +3,7 @@ from pathlib import Path
 
 import imageio
 import numpy as np
-import nibabel as nib
+import SimpleITK as sitk
 import h5py
 from pytorch3dunet.augment import transforms
 from pytorch3dunet.datasets.utils import ConfigDataset, calculate_stats
@@ -12,14 +12,15 @@ from pytorch3dunet.datasets.hdf5 import AbstractHDF5Dataset
 from pytorch3dunet.datasets.visualize import visualizer
 from scipy import ndimage
 
+import re
 import yaml
 import ipdb
 import torch
 
-logger = get_logger('Kits19Dataset')
+logger = get_logger('SXTHDataset')
 
 
-class Kits19Dataset(AbstractHDF5Dataset):
+class SXTHDataset(AbstractHDF5Dataset):
     def __init__(self, file_path, phase, slice_builder_config, transformer_config, mirror_padding=(16, 32, 32),
                  raw_internal_path='raw', label_internal_path='label', weight_internal_path=None):
         super().__init__(file_path=file_path,
@@ -34,31 +35,17 @@ class Kits19Dataset(AbstractHDF5Dataset):
     @classmethod
     def create_datasets(cls, dataset_config, phase):
         # prerocess each patient case
-        
-        # exist folder for storing preprocessed files?
+        sxth_case_loader = SXTHCaseLoader( dataset_config['original_data_dir']  )
+        sxth_case_loader.set_phase(phase)
         cls.original_dir = Path(dataset_config['original_data_dir'])
         cls.train_dir = Path(dataset_config[phase]['file_paths'][0])
         if cls.train_dir.is_dir() == False: 
-            cls.train_dir.mkdir()
+            cls.train_dir.mkdir( parents = True )
 
         # exist already preprocessed data?
         files = os.listdir(cls.train_dir)
         need_processing = True 
 
-        if phase == 'train':
-            id_range = [x for x in list(range(0,200)) if x not in [15,37,88]]
-        if phase == 'val':
-            id_range = range(200, 210)
-        if phase == 'test':
-            id_range = range(210, 300)       
-
-        if (phase == 'train' and len(files) == len(id_range) ) or \
-           (phase == 'val' and len(files) == len(id_range) ) or \
-           (phase == 'test' and len(files) == len(id_range) ):
-             need_processing = False
-
-
-        
         if need_processing:
             # deleted existed files
             for f in files:
@@ -79,29 +66,17 @@ class Kits19Dataset(AbstractHDF5Dataset):
             foreground_vol = np.array([])
             one_case_visualizer = visualizer()
 
-            for case_id in id_range:
+            for vol,seg,img_info in sxth_case_loader: 
 
-                print(f'Preprocessing {phase} case {case_id+1}/{len(id_range)},')
-                print('\t reading data ...,')
-                if phase != 'test':
-                    vol, seg = cls.load_case(cls, case_id)
-                    seg = seg.get_data()
-                    seg = seg.astype(np.int32)
-                    print(f'\t original shape: {vol.shape}')
-                else: 
-                    vol = cls.load_case(cls, case_id)
-                #spacing = vol.affine
-                spacing = vol.header.get_zooms()
-                vol = vol.get_data()
-
-                # crop CT image to humman body
-                if phase != 'test':
-                    crop_border = cls.crop_image_only_outside(cls, vol, -1000)
-                    seg = seg[:,crop_border[0]:crop_border[1], crop_border[2]:crop_border[3]]
-                    vol = vol[:,crop_border[0]:crop_border[1], crop_border[2]:crop_border[3]]
+                spacing = img_info['Spacing']
+                case_id = img_info['Case_id']
+                #if phase != 'test':
+                #    crop_border = cls.crop_image_only_outside(cls, vol, -1000)
+                #    seg = seg[:,crop_border[0]:crop_border[1], crop_border[2]:crop_border[3]]
+                #    vol = vol[:,crop_border[0]:crop_border[1], crop_border[2]:crop_border[3]]
 
                 # resample (or re-slice) for isotropic voxel
-                new_spacing = [2,2,2]
+                new_spacing = [2, 0.8, 0.8]
                 resize_factor = np.array(spacing) / new_spacing
                 new_real_shape = vol.shape * resize_factor
                 new_shape = np.round(new_real_shape)   
@@ -117,7 +92,7 @@ class Kits19Dataset(AbstractHDF5Dataset):
                 print(f'\t shape after resample: {vol.shape}') 
                 
                 print('\t resampling segmetation voxel ...')
-                nclass = 3
+                nclass = 2 
                 seg_resampled = np.zeros( ( nclass, vol.shape[0], vol.shape[1], vol.shape[2] ), dtype='int32' )
                 if phase != 'test':
                     seg_expanded = torch.from_numpy( np.expand_dims(seg.astype('int64'),0) )
@@ -125,21 +100,9 @@ class Kits19Dataset(AbstractHDF5Dataset):
                     for ilabel in range( nclass):
                         seg_resampled[ilabel,] = ndimage.zoom( seg_onehot[ilabel,], resize_factor, order= 0)
                     seg = np.argmax( seg_resampled, axis = 0)
-                    # 3D ROI, CT slices only contain masks will be preserved
-                    ior_z = []
-                    for i in range( seg.shape[0]):
-                      unique_list = np.unique(seg[i,:,:])
-                      assert( all( [ element in (0,1,2) for element in unique_list] ))
-                      if len(unique_list) > 1 and len(unique_list)<=3:
-                             ior_z.append(i)
-                    ior_zmin = min(ior_z ) if min(ior_z)-3 < 0 else min(ior_z) - 3
-                    ior_zmax = max(ior_z) if max(ior_z)+3 > vol.shape[0] else max(ior_z) + 3
-                    vol = vol[ior_zmin:ior_zmax+1,:,:]
-                    seg = seg[ior_zmin:ior_zmax+1,:,:]
 		    # collect all fore-ground voxels for further compute  max/min/mean/std value
                     foreground_vol = np.concatenate((foreground_vol, vol[seg>0]),axis = 0)
-                #ipdb.set_trace()
-                #one_case_visualizer.save(vol,seg,'/mnt/sda2/kits19_processed/img') 
+                #one_case_visualizer.save(vol,seg,'/mnt/sda2/sxth_processed/img') 
                 print(f'\t after removing slices without masks, image & segmentation data shape is {vol.shape} ')
                 print('\t done.')
 
@@ -152,15 +115,9 @@ class Kits19Dataset(AbstractHDF5Dataset):
                 f.close()
                 seg_info.append(vol.shape)
             
-            if phase != 'test':
-                ipdb.set_trace()
-                print( np.percentile(foreground_vol,99.5) )
-                print( np.percentile(foreground_vol,0.5) )
-                foreground_vol = foreground_vol[ (foreground_vol>=-73) & ( foreground_vol<=289 ) ]
-        
         # save data to disk
         #save_img = visualizer(vol_folder = dataset_config.get(phase)['file_paths'][0]) 
-        #save_img.save_train_cases( '/mnt/sda2/kits19_processed/img/')
+        #save_img.save_train_cases( '/mnt/sda2/sxth_processed/img/')
         #ipdb.set_trace()
         return super().create_datasets( dataset_config, phase )
         
@@ -194,8 +151,8 @@ class Kits19Dataset(AbstractHDF5Dataset):
         # they min, max, mean, std should be provided in the config
         logger.info(
             'Using LazyHDF5Dataset. Make sure that the min/max/mean/std values are provided in the loaders config')
-        return -100, 350, 95, 67 
-        #return None, None, None, None
+        #return 40, 250, 110, 31 
+        return 0, 600, None, None
     
     def load_case(self,cid):
         # Resolve location where data should be living
@@ -256,4 +213,56 @@ class Kits19Dataset(AbstractHDF5Dataset):
         ax.set_zlim(0, p.shape[2])
         plt.show()
 
+
+class SXTHCaseLoader():
+    def __init__(self, data_folder):
+        self.img_folder = Path(data_folder)/'T2_case1-200'
+        self.seg_folder = Path(data_folder)/'ROI_T2'
+        self.reader = sitk.ImageSeriesReader()
+        if not self.img_folder.exists() or not self.seg_folder.exists():
+            raise IOError( "IMG or SEG path, {}, could not be resolved".format(str(img_folder)) )
+        self.cases_img = os.listdir( self.img_folder )
+        self.cases_seg = os.listdir( self.seg_folder )
+        assert len(self.cases_img)==len(self.cases_seg)
+        self.n_train = round( len(self.cases_img) * 0.8 )
+        self.n_val = len(self.cases_img) - self.n_train
+           
+    def __iter__(self):
+        assert self.phase == 'train' or self.phase == 'val'
+        self.n_cases = self.n_train if self.phase == 'train' else self.n_val
+        self.i_case = 0
+        return self
+
+    def __next__(self):
+        print( f'current case: {self.i_case}/{self.n_cases}' )
+        if self.i_case >= self.n_cases: 
+            raise StopIteration 
+        img_names = self.reader.GetGDCMSeriesFileNames( str(self.img_path[ self.i_case ] ) )
+
+        self.reader.SetFileNames( img_names )
+        image = self.reader.Execute( )
+        image_array = sitk.GetArrayFromImage( image )
+        info_spacing = image.GetSpacing()
+        image_info = {'Case_id': self.i_case,'Spacing': (info_spacing[2], info_spacing[0], info_spacing[1]) }
+
+        seg = sitk.ReadImage( str( self.seg_path[ self.i_case ] ) )
+        seg_array = sitk.GetArrayFromImage( seg )
+
+        self.i_case+=1
+        return image_array, seg_array, image_info
+
+    def set_phase( self, phase ):
+        assert phase == 'train' or phase == 'val'
+        self.phase = phase
+        self.img_path = []
+        self.seg_path = []
+        cases_img_selected = self.cases_img[0:self.n_train] if self.phase == 'train' else self.cases_img[self.n_train:]
+        for case_name in cases_img_selected:
+            idx = re.findall('\d*.?\d', case_name)[0]
+            sub_folder = os.listdir( self.img_folder/case_name )[0]
+            self.img_path.append( self.img_folder/case_name/sub_folder )
+            self.seg_path.append( self.seg_folder/(idx+'hrT2a_Merge.nii') )
+
+
+        
 

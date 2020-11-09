@@ -28,6 +28,7 @@ BoundaryAveragePrecision	pytorch3dunet/unet3d/metrics.py	/^class BoundaryAverage
 Cell boundary predictions for confocal images of Arabidopsis thaliana ovules	README.md	/^### Cell boundary predictions for confocal images of Arabidopsis thaliana ovules$/;"	S	section:pytorch-3dunet""Examples
 Cell boundary predictions for lightsheet images of Arabidopsis thaliana lateral root	README.md	/^### Cell boundary predictions for lightsheet images of Arabidopsis thaliana lateral root$/;"	S	section:pytorch-3dunet""Examples
 Cite	README.md	/^## Cite$/;"	s	chapter:pytorch-3dunet
+ComboLoss	pytorch3dunet/unet3d/losses.py	/^class ComboLoss(nn.Module):$/;"	c
 Conda build	conda-recipe/README.md	/^## Conda build$/;"	s
 ConfigDataset	pytorch3dunet/datasets/utils.py	/^class ConfigDataset(Dataset):$/;"	c
 ContrastiveLoss	pytorch3dunet/embeddings/contrastive_loss.py	/^class ContrastiveLoss(nn.Module):$/;"	c
@@ -62,6 +63,7 @@ GenericAdaptedRandError	pytorch3dunet/unet3d/metrics.py	/^class GenericAdaptedRa
 GenericAveragePrecision	pytorch3dunet/unet3d/metrics.py	/^class GenericAveragePrecision:$/;"	c
 Getting Started	README.md	/^## Getting Started$/;"	s	chapter:pytorch-3dunet
 Identity	pytorch3dunet/augment/transforms.py	/^class Identity:$/;"	c
+Incre_std_avg_max_min	pytorch3dunet/datasets/utils.py	/^class Incre_std_avg_max_min():$/;"	c
 Installation	README.md	/^## Installation$/;"	s	chapter:pytorch-3dunet
 Installation tips	README.md	/^### Installation tips$/;"	S	section:pytorch-3dunet""Installation
 InverseAngularError	pytorch3dunet/unet3d/metrics.py	/^class InverseAngularError:$/;"	c
@@ -98,6 +100,8 @@ ResidualUNet3D	pytorch3dunet/unet3d/model.py	/^class ResidualUNet3D(Abstract3DUN
 Running on Windows	README.md	/^### Running on Windows$/;"	S	section:pytorch-3dunet""Prerequisites
 RunningAverage	pytorch3dunet/unet3d/utils.py	/^class RunningAverage:$/;"	c
 SUPPORTED_LOSSES	pytorch3dunet/unet3d/losses.py	/^SUPPORTED_LOSSES = ['BCEWithLogitsLoss', 'BCEDiceLoss', 'CrossEntropyLoss', 'WeightedCrossEntrop/;"	v
+SXTHCaseLoader	pytorch3dunet/datasets/sxth.py	/^class SXTHCaseLoader():$/;"	c
+SXTHDataset	pytorch3dunet/datasets/sxth.py	/^class SXTHDataset(AbstractHDF5Dataset):$/;"	c
 SegmentationMetrics	pytorch3dunet/unet3d/seg_metrics.py	/^class SegmentationMetrics:$/;"	c
 Semantic Segmentation	README.md	/^### Semantic Segmentation$/;"	S	section:pytorch-3dunet""Supported Evaluation Metrics
 Semantic Segmentation	README.md	/^### Semantic Segmentation$/;"	S	section:pytorch-3dunet""Supported Loss Functions
@@ -107,6 +111,7 @@ SliceBuilder	pytorch3dunet/datasets/utils.py	/^class SliceBuilder:$/;"	c
 StandardHDF5Dataset	pytorch3dunet/datasets/hdf5.py	/^class StandardHDF5Dataset(AbstractHDF5Dataset):$/;"	c
 StandardLabelToBoundary	pytorch3dunet/augment/transforms.py	/^class StandardLabelToBoundary:$/;"	c
 StandardPredictor	pytorch3dunet/unet3d/predictor.py	/^class StandardPredictor(_AbstractPredictor):$/;"	c
+StandardPredictorWithResample	pytorch3dunet/unet3d/predictor.py	/^class StandardPredictorWithResample(StandardPredictor):$/;"	c
 Standardize	pytorch3dunet/augment/transforms.py	/^class Standardize:$/;"	c
 Supported Evaluation Metrics	README.md	/^## Supported Evaluation Metrics$/;"	s	chapter:pytorch-3dunet
 Supported Loss Functions	README.md	/^## Supported Loss Functions$/;"	s	chapter:pytorch-3dunet
@@ -197,11 +202,14 @@ __init__	pytorch3dunet/datasets/hdf5.py	/^    def __init__(self, file_path, phas
 __init__	pytorch3dunet/datasets/hdf5.py	/^    def __init__(self, file_path, phase, slice_builder_config, transformer_config, mirror_paddin/;"	m	class:StandardHDF5Dataset
 __init__	pytorch3dunet/datasets/hdf5.py	/^    def __init__(self, file_path,$/;"	m	class:AbstractHDF5Dataset
 __init__	pytorch3dunet/datasets/kits19.py	/^    def __init__(self, file_path, phase, slice_builder_config, transformer_config, mirror_paddin/;"	m	class:Kits19Dataset
+__init__	pytorch3dunet/datasets/sxth.py	/^    def __init__(self, data_folder):$/;"	m	class:SXTHCaseLoader
+__init__	pytorch3dunet/datasets/sxth.py	/^    def __init__(self, file_path, phase, slice_builder_config, transformer_config, mirror_paddin/;"	m	class:SXTHDataset
+__init__	pytorch3dunet/datasets/utils.py	/^    def __init__(self, h_avg=0, h_std=0, h_max=float('-inf'), h_min=float('inf'), n=0):$/;"	m	class:Incre_std_avg_max_min
 __init__	pytorch3dunet/datasets/utils.py	/^    def __init__(self, raw_datasets, label_datasets, weight_dataset, patch_shape, stride_shape, /;"	m	class:SliceBuilder
 __init__	pytorch3dunet/datasets/utils.py	/^    def __init__(self, raw_datasets, label_datasets, weight_datasets, patch_shape, stride_shape,/;"	m	class:EmbeddingsSliceBuilder
 __init__	pytorch3dunet/datasets/utils.py	/^    def __init__(self, raw_datasets, label_datasets, weight_datasets, patch_shape, stride_shape,/;"	m	class:FilterSliceBuilder
 __init__	pytorch3dunet/datasets/utils.py	/^    def __init__(self, raw_datasets, label_datasets, weight_datasets, patch_shape, stride_shape,/;"	m	class:RandomFilterSliceBuilder
-__init__	pytorch3dunet/datasets/visualize.py	/^    def __init__(self):$/;"	m	class:visualizer
+__init__	pytorch3dunet/datasets/visualize.py	/^    def __init__(self, vol_folder = None, seg_folder = None):$/;"	m	class:visualizer
 __init__	pytorch3dunet/embeddings/contrastive_loss.py	/^    def __init__(self, delta_var, delta_dist, norm='fro', alpha=1., beta=1., gamma=0.001):$/;"	m	class:ContrastiveLoss
 __init__	pytorch3dunet/unet3d/buildingblocks.py	/^    def __init__(self, in_channels, out_channels, conv_kernel_size=3, apply_pooling=True,$/;"	m	class:Encoder
 __init__	pytorch3dunet/unet3d/buildingblocks.py	/^    def __init__(self, in_channels, out_channels, conv_kernel_size=3, scale_factor=(2, 2, 2), ba/;"	m	class:Decoder
@@ -210,6 +218,7 @@ __init__	pytorch3dunet/unet3d/buildingblocks.py	/^    def __init__(self, in_chan
 __init__	pytorch3dunet/unet3d/buildingblocks.py	/^    def __init__(self, in_channels, out_channels, kernel_size=3, order='gcr', num_groups=8, padd/;"	m	class:SingleConv
 __init__	pytorch3dunet/unet3d/buildingblocks.py	/^    def __init__(self, transposed_conv, in_channels=None, out_channels=None, kernel_size=3,$/;"	m	class:Upsampling
 __init__	pytorch3dunet/unet3d/losses.py	/^    def __init__(self, alpha, beta):$/;"	m	class:BCEDiceLoss
+__init__	pytorch3dunet/unet3d/losses.py	/^    def __init__(self, class_weight=None, sigmoid_normalization=True, ignore_index = None):$/;"	m	class:ComboLoss
 __init__	pytorch3dunet/unet3d/losses.py	/^    def __init__(self, class_weights=None, ignore_index=None):$/;"	m	class:PixelWiseCrossEntropyLoss
 __init__	pytorch3dunet/unet3d/losses.py	/^    def __init__(self, ignore_index=-1):$/;"	m	class:WeightedCrossEntropyLoss
 __init__	pytorch3dunet/unet3d/losses.py	/^    def __init__(self, loss, ignore_index):$/;"	m	class:_MaskingLossWrapper
@@ -240,6 +249,7 @@ __init__	pytorch3dunet/unet3d/model.py	/^    def __init__(self, in_channels, out
 __init__	pytorch3dunet/unet3d/predictor.py	/^    def __init__(self, model, loader, output_file, config, **kwargs):$/;"	m	class:DSB2018Predictor
 __init__	pytorch3dunet/unet3d/predictor.py	/^    def __init__(self, model, loader, output_file, config, **kwargs):$/;"	m	class:LazyPredictor
 __init__	pytorch3dunet/unet3d/predictor.py	/^    def __init__(self, model, loader, output_file, config, **kwargs):$/;"	m	class:StandardPredictor
+__init__	pytorch3dunet/unet3d/predictor.py	/^    def __init__(self, model, loader, output_file, config, **kwargs):$/;"	m	class:StandardPredictorWithResample
 __init__	pytorch3dunet/unet3d/predictor.py	/^    def __init__(self, model, loader, output_file, config, **kwargs):$/;"	m	class:_AbstractPredictor
 __init__	pytorch3dunet/unet3d/predictor.py	/^    def __init__(self, model, loader, output_file, config, clustering, iou_threshold=0.7, noise_/;"	m	class:EmbeddingsPredictor
 __init__	pytorch3dunet/unet3d/seg_metrics.py	/^    def __init__(self):$/;"	m	class:AveragePrecision
@@ -251,9 +261,11 @@ __init__	pytorch3dunet/unet3d/utils.py	/^    def __init__(self, **kwargs):$/;"	m
 __init__	pytorch3dunet/unet3d/utils.py	/^    def __init__(self, plot_variance=False, **kwargs):$/;"	m	class:EmbeddingsTensorboardFormatter
 __init__	pytorch3dunet/unet3d/utils.py	/^    def __init__(self, skip_last_target=False, **kwargs):$/;"	m	class:DefaultTensorboardFormatter
 __init__	tests/test_predictor.py	/^    def __init__(self, model, loader, output_file, config, clustering, iou_threshold=0.7, **kwar/;"	m	class:FakePredictor
+__iter__	pytorch3dunet/datasets/sxth.py	/^    def __iter__(self):$/;"	m	class:SXTHCaseLoader
 __len__	pytorch3dunet/datasets/dsb.py	/^    def __len__(self):$/;"	m	class:DSB2018Dataset
 __len__	pytorch3dunet/datasets/hdf5.py	/^    def __len__(self):$/;"	m	class:AbstractHDF5Dataset
 __len__	pytorch3dunet/datasets/utils.py	/^    def __len__(self):$/;"	m	class:ConfigDataset
+__next__	pytorch3dunet/datasets/sxth.py	/^    def __next__(self):$/;"	m	class:SXTHCaseLoader
 __version__	pytorch3dunet/__version__.py	/^__version__ = '1.2.12'$/;"	v
 _allocate_prediction_maps	pytorch3dunet/unet3d/predictor.py	/^    def _allocate_prediction_maps(self, output_shape, output_heads, output_file):$/;"	m	class:LazyPredictor
 _allocate_prediction_maps	pytorch3dunet/unet3d/predictor.py	/^    def _allocate_prediction_maps(self, output_shape, output_heads, output_file):$/;"	m	class:StandardPredictor
@@ -300,6 +312,7 @@ _joining	pytorch3dunet/unet3d/buildingblocks.py	/^    def _joining(encoder_featu
 _load_config_yaml	pytorch3dunet/unet3d/config.py	/^def _load_config_yaml(config_file):$/;"	f
 _load_files	pytorch3dunet/datasets/dsb.py	/^    def _load_files(dir, expand_dims):$/;"	m	class:DSB2018Dataset
 _load_files	pytorch3dunet/datasets/kits19.py	/^    def _load_files(dir, expand_dims):$/;"	m	class:Kits19Dataset
+_load_files	pytorch3dunet/datasets/sxth.py	/^    def _load_files(dir, expand_dims):$/;"	m	class:SXTHDataset
 _log_images	pytorch3dunet/unet3d/trainer.py	/^    def _log_images(self, input, target, prediction, prefix=''):$/;"	m	class:UNet3DTrainer
 _log_lr	pytorch3dunet/unet3d/trainer.py	/^    def _log_lr(self):$/;"	m	class:UNet3DTrainer
 _log_params	pytorch3dunet/unet3d/trainer.py	/^    def _log_params(self):$/;"	m	class:UNet3DTrainer
@@ -321,8 +334,10 @@ _relabel	pytorch3dunet/unet3d/seg_metrics.py	/^def _relabel(input):$/;"	f
 _save_checkpoint	pytorch3dunet/unet3d/trainer.py	/^    def _save_checkpoint(self, is_best):$/;"	m	class:UNet3DTrainer
 _save_results	pytorch3dunet/unet3d/predictor.py	/^    def _save_results(self, prediction_maps, normalization_masks, output_heads, output_file, dat/;"	m	class:LazyPredictor
 _save_results	pytorch3dunet/unet3d/predictor.py	/^    def _save_results(self, prediction_maps, normalization_masks, output_heads, output_file, dat/;"	m	class:StandardPredictor
+_save_results	pytorch3dunet/unet3d/predictor.py	/^    def _save_results(self, prediction_maps, normalization_masks, output_heads, output_file, dat/;"	m	class:StandardPredictorWithResample
 _slice_builder_conf	tests/test_dataset.py	/^def _slice_builder_conf(patch_shape, stride_shape):$/;"	f
 _slice_from_pad	pytorch3dunet/unet3d/predictor.py	/^        def _slice_from_pad(pad):$/;"	f	member:StandardPredictor._save_results	file:
+_slice_from_pad	pytorch3dunet/unet3d/predictor.py	/^        def _slice_from_pad(pad):$/;"	f	member:StandardPredictorWithResample._save_results	file:
 _slice_from_pad	pytorch3dunet/unet3d/predictor.py	/^    def _slice_from_pad(self, pad):$/;"	m	class:DSB2018Predictor
 _split_training_batch	pytorch3dunet/unet3d/trainer.py	/^    def _split_training_batch(self, t):$/;"	m	class:UNet3DTrainer
 _start_and_pad	pytorch3dunet/augment/transforms.py	/^        def _start_and_pad(crop_size, max_size):$/;"	f	member:CropToFixed.__call__	file:
@@ -332,7 +347,6 @@ _transformer_class	pytorch3dunet/augment/transforms.py	/^    def _transformer_cl
 _validate_halo	pytorch3dunet/unet3d/predictor.py	/^    def _validate_halo(patch_halo, slice_builder_config):$/;"	m	class:StandardPredictor
 _volume_shape	pytorch3dunet/datasets/hdf5.py	/^        def _volume_shape(volume):$/;"	f	member:AbstractHDF5Dataset._check_dimensionality	file:
 _volume_shape	pytorch3dunet/unet3d/predictor.py	/^    def _volume_shape(dataset):$/;"	m	class:_AbstractPredictor
-a	pytorch3dunet/a.py	/^a = np.array([0,1])$/;"	v
 accuracy	pytorch3dunet/unet3d/seg_metrics.py	/^def accuracy(tp, fp, fn):$/;"	f
 assert_train_save_load	tests/test_trainer.py	/^def assert_train_save_load(tmpdir, train_config, loss, val_metric, model, weight_map=False, shap/;"	f
 blur_boundary	pytorch3dunet/augment/transforms.py	/^def blur_boundary(boundary, sigma):$/;"	f
@@ -347,19 +361,24 @@ create_conv	pytorch3dunet/unet3d/buildingblocks.py	/^def create_conv(in_channels
 create_datasets	pytorch3dunet/datasets/dsb.py	/^    def create_datasets(cls, dataset_config, phase):$/;"	m	class:DSB2018Dataset
 create_datasets	pytorch3dunet/datasets/hdf5.py	/^    def create_datasets(cls, dataset_config, phase):$/;"	m	class:AbstractHDF5Dataset
 create_datasets	pytorch3dunet/datasets/kits19.py	/^    def create_datasets(cls, dataset_config, phase):$/;"	m	class:Kits19Dataset
+create_datasets	pytorch3dunet/datasets/sxth.py	/^    def create_datasets(cls, dataset_config, phase):$/;"	m	class:SXTHDataset
 create_datasets	pytorch3dunet/datasets/utils.py	/^    def create_datasets(cls, dataset_config, phase):$/;"	m	class:ConfigDataset
 create_h5_file	pytorch3dunet/datasets/hdf5.py	/^    def create_h5_file(file_path, internal_paths):$/;"	m	class:AbstractHDF5Dataset
 create_h5_file	pytorch3dunet/datasets/hdf5.py	/^    def create_h5_file(file_path, internal_paths):$/;"	m	class:LazyHDF5Dataset
 create_h5_file	pytorch3dunet/datasets/hdf5.py	/^    def create_h5_file(file_path, internal_paths):$/;"	m	class:StandardHDF5Dataset
 create_h5_file	pytorch3dunet/datasets/kits19.py	/^    def create_h5_file(file_path, internal_paths):$/;"	m	class:Kits19Dataset
+create_h5_file	pytorch3dunet/datasets/sxth.py	/^    def create_h5_file(file_path, internal_paths):$/;"	m	class:SXTHDataset
 create_kernel	pytorch3dunet/augment/transforms.py	/^    def create_kernel(axis, offset):$/;"	m	class:AbstractLabelToBoundary
 create_random_dataset	tests/test_dataset.py	/^def create_random_dataset(shape, ignore_index=False, raw_datasets=None, label_datasets=None):$/;"	f
+crop_image_only_outside	pytorch3dunet/datasets/kits19.py	/^    def crop_image_only_outside(self, img, tol):$/;"	m	class:Kits19Dataset
+crop_image_only_outside	pytorch3dunet/datasets/sxth.py	/^    def crop_image_only_outside(self, img, tol):$/;"	m	class:SXTHDataset
 dice	pytorch3dunet/unet3d/losses.py	/^    def dice(self, input, target, weight):$/;"	m	class:DiceLoss
 dice	pytorch3dunet/unet3d/losses.py	/^    def dice(self, input, target, weight):$/;"	m	class:GeneralizedDiceLoss
 dice	pytorch3dunet/unet3d/losses.py	/^    def dice(self, input, target, weight):$/;"	m	class:_AbstractDiceLoss
 ds_stats	pytorch3dunet/datasets/hdf5.py	/^    def ds_stats(self):$/;"	m	class:AbstractHDF5Dataset
 ds_stats	pytorch3dunet/datasets/hdf5.py	/^    def ds_stats(self):$/;"	m	class:LazyHDF5Dataset
 ds_stats	pytorch3dunet/datasets/kits19.py	/^    def ds_stats(self):$/;"	m	class:Kits19Dataset
+ds_stats	pytorch3dunet/datasets/sxth.py	/^    def ds_stats(self):$/;"	m	class:SXTHDataset
 dummy_input	tests/test_bioimage-io/test_UNet3DArabidopsisOvules.py	/^def dummy_input():$/;"	f
 eval	tests/test_predictor.py	/^    def eval(self):$/;"	m	class:FakeModel
 eval_model_zip	tests/test_bioimage-io/test_packages/test_UNet3DArabidopsisOvules_model.py	/^def eval_model_zip(model_zip: ZipFile, cache_path: Path):$/;"	f
@@ -370,6 +389,7 @@ fetch_datasets	pytorch3dunet/datasets/hdf5.py	/^    def fetch_datasets(input_fil
 fetch_datasets	pytorch3dunet/datasets/hdf5.py	/^    def fetch_datasets(input_file_h5, internal_paths):$/;"	m	class:LazyHDF5Dataset
 fetch_datasets	pytorch3dunet/datasets/hdf5.py	/^    def fetch_datasets(input_file_h5, internal_paths):$/;"	m	class:StandardHDF5Dataset
 fetch_datasets	pytorch3dunet/datasets/kits19.py	/^    def fetch_datasets(input_file_h5, internal_paths):$/;"	m	class:Kits19Dataset
+fetch_datasets	pytorch3dunet/datasets/sxth.py	/^    def fetch_datasets(input_file_h5, internal_paths):$/;"	m	class:SXTHDataset
 find_maximum_patch_size	pytorch3dunet/unet3d/utils.py	/^def find_maximum_patch_size(model, device):$/;"	f
 fit	pytorch3dunet/unet3d/trainer.py	/^    def fit(self):$/;"	m	class:UNet3DTrainer
 flatten	pytorch3dunet/unet3d/losses.py	/^def flatten(tensor):$/;"	f
@@ -385,6 +405,7 @@ forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target):$/
 forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target):$/;"	m	class:WeightedSmoothL1Loss
 forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target):$/;"	m	class:_AbstractDiceLoss
 forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target):$/;"	m	class:_MaskingLossWrapper
+forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target, weights):$/;"	m	class:ComboLoss
 forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, input, target, weights=None):$/;"	m	class:PixelWiseCrossEntropyLoss
 forward	pytorch3dunet/unet3d/losses.py	/^    def forward(self, inputs, targets, weight):$/;"	m	class:TagsAngularLoss
 forward	pytorch3dunet/unet3d/model.py	/^    def forward(self, x):$/;"	m	class:Abstract3DUNet
@@ -409,6 +430,12 @@ hu_to_grayscale	pytorch3dunet/datasets/visualize.py	/^    def hu_to_grayscale(se
 ignore_predicate	pytorch3dunet/datasets/utils.py	/^        def ignore_predicate(raw_label_idx):$/;"	f	member:EmbeddingsSliceBuilder.__init__	file:
 ignore_predicate	pytorch3dunet/datasets/utils.py	/^        def ignore_predicate(raw_label_idx):$/;"	f	member:FilterSliceBuilder.__init__	file:
 ignore_predicate	pytorch3dunet/datasets/utils.py	/^        def ignore_predicate(raw_label_idx):$/;"	f	member:RandomFilterSliceBuilder.__init__	file:
+image	sxth.py	/^image = reader.Execute()$/;"	v
+image_array	sxth.py	/^image_array = sitk.GetArrayFromImage(image) $/;"	v
+img_names	sxth.py	/^img_names = reader.GetGDCMSeriesFileNames(img_path)$/;"	v
+img_path	sxth.py	/^img_path = '\/mnt\/sda2\/sxth_data\/T2_case1-200\/2wjs\/2hrT2a'$/;"	v
+incre_in_list	pytorch3dunet/datasets/utils.py	/^    def incre_in_list(self, new_list):$/;"	m	class:Incre_std_avg_max_min
+incre_in_value	pytorch3dunet/datasets/utils.py	/^    def incre_in_value(self, value):$/;"	m	class:Incre_std_avg_max_min
 input_to_seg	pytorch3dunet/unet3d/metrics.py	/^    def input_to_seg(self, input):$/;"	m	class:BlobsAveragePrecision
 input_to_seg	pytorch3dunet/unet3d/metrics.py	/^    def input_to_seg(self, input):$/;"	m	class:BlobsBoundaryAveragePrecision
 input_to_seg	pytorch3dunet/unet3d/metrics.py	/^    def input_to_seg(self, input):$/;"	m	class:BoundaryAveragePrecision
@@ -421,6 +448,7 @@ input_to_segm	pytorch3dunet/unet3d/metrics.py	/^    def input_to_segm(self, inpu
 label_slices	pytorch3dunet/datasets/utils.py	/^    def label_slices(self):$/;"	m	class:SliceBuilder
 label_transform	pytorch3dunet/augment/transforms.py	/^    def label_transform(self):$/;"	m	class:Transformer
 load_case	pytorch3dunet/datasets/kits19.py	/^    def load_case(self,cid):$/;"	m	class:Kits19Dataset
+load_case	pytorch3dunet/datasets/sxth.py	/^    def load_case(self,cid):$/;"	m	class:SXTHDataset
 load_checkpoint	pytorch3dunet/unet3d/utils.py	/^def load_checkpoint(checkpoint_path, model, optimizer=None):$/;"	f
 load_config	pytorch3dunet/unet3d/config.py	/^def load_config():$/;"	f
 lock	pytorch3dunet/datasets/hdf5.py	/^lock = Lock()$/;"	v
@@ -428,6 +456,7 @@ log_info	pytorch3dunet/unet3d/utils.py	/^    def log_info(message):$/;"	f	functi
 logger	pytorch3dunet/datasets/dsb.py	/^logger = get_logger('DSB2018Dataset')$/;"	v
 logger	pytorch3dunet/datasets/hdf5.py	/^logger = get_logger('HDF5Dataset')$/;"	v
 logger	pytorch3dunet/datasets/kits19.py	/^logger = get_logger('Kits19Dataset')$/;"	v
+logger	pytorch3dunet/datasets/sxth.py	/^logger = get_logger('SXTHDataset')$/;"	v
 logger	pytorch3dunet/datasets/utils.py	/^logger = get_logger('Dataset')$/;"	v
 logger	pytorch3dunet/predict.py	/^logger = utils.get_logger('UNet3DPredict')$/;"	v
 logger	pytorch3dunet/train.py	/^logger = get_logger('UNet3DTrain')$/;"	v
@@ -439,7 +468,9 @@ loggers	pytorch3dunet/unet3d/utils.py	/^loggers = {}$/;"	v
 main	pytorch3dunet/predict.py	/^def main():$/;"	f
 main	pytorch3dunet/train.py	/^def main():$/;"	f
 metrics	pytorch3dunet/unet3d/seg_metrics.py	/^    def metrics(self, iou_threshold):$/;"	m	class:SegmentationMetrics
+mri_visulizer	sxth.py	/^mri_visulizer = visualizer()$/;"	v
 nib	pytorch3dunet/datasets/kits19.py	/^import nibabel as nib$/;"	I
+nib	sxth.py	/^import nibabel as nib$/;"	I
 nn	pytorch3dunet/predict.py	/^import torch.nn as nn$/;"	I
 nn	pytorch3dunet/train.py	/^import torch.nn as nn$/;"	I
 nn	pytorch3dunet/unet3d/buildingblocks.py	/^from torch import nn as nn$/;"	x
@@ -447,17 +478,18 @@ nn	pytorch3dunet/unet3d/losses.py	/^from torch import nn as nn$/;"	x
 nn	pytorch3dunet/unet3d/model.py	/^import torch.nn as nn$/;"	I
 nn	pytorch3dunet/unet3d/trainer.py	/^import torch.nn as nn$/;"	I
 nn	tests/test_criterion.py	/^import torch.nn as nn$/;"	I
-np	pytorch3dunet/a.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/augment/transforms.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/datasets/dsb.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/datasets/hdf5.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/datasets/kits19.py	/^import numpy as np$/;"	I
+np	pytorch3dunet/datasets/sxth.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/datasets/utils.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/datasets/visualize.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/unet3d/metrics.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/unet3d/predictor.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/unet3d/seg_metrics.py	/^import numpy as np$/;"	I
 np	pytorch3dunet/unet3d/utils.py	/^import numpy as np$/;"	I
+np	sxth.py	/^import numpy as np $/;"	I
 np	tests/conftest.py	/^import numpy as np$/;"	I
 np	tests/test_bioimage-io/test_UNet3DArabidopsisOvules.py	/^import numpy as np$/;"	I
 np	tests/test_criterion.py	/^import numpy as np$/;"	I
@@ -470,7 +502,8 @@ optim	pytorch3dunet/train.py	/^import torch.optim as optim$/;"	I
 overlay	pytorch3dunet/datasets/visualize.py	/^    def overlay(self, volume_ims, segmentation_ims, segmentation, alpha):$/;"	m	class:visualizer
 ovule_label	tests/conftest.py	/^def ovule_label():$/;"	f
 package_bytes	tests/test_bioimage-io/test_packages/test_UNet3DArabidopsisOvules_model.py	/^def package_bytes(cache_path):$/;"	f
-plot_3d	pytorch3dunet/datasets/kits19.py	/^    def plot_3d(image, threshold=-300):$/;"	m	class:Kits19Dataset
+plot_3d	pytorch3dunet/datasets/kits19.py	/^    def plot_3d(self, image, threshold=-300):$/;"	m	class:Kits19Dataset
+plot_3d	pytorch3dunet/datasets/sxth.py	/^    def plot_3d(self, image, threshold=-300):$/;"	m	class:SXTHDataset
 plot_segm	pytorch3dunet/unet3d/utils.py	/^def plot_segm(segm, ground_truth, plots_dir='.'):$/;"	f
 plt	pytorch3dunet/unet3d/utils.py	/^import matplotlib.pyplot as plt$/;"	I
 precision	pytorch3dunet/unet3d/seg_metrics.py	/^def precision(tp, fp, fn):$/;"	f
@@ -488,13 +521,22 @@ random_input	tests/conftest.py	/^def random_input(tmpdir):$/;"	f
 random_input_with_ignore	tests/conftest.py	/^def random_input_with_ignore(tmpdir):$/;"	f
 raw_slices	pytorch3dunet/datasets/utils.py	/^    def raw_slices(self):$/;"	m	class:SliceBuilder
 raw_transform	pytorch3dunet/augment/transforms.py	/^    def raw_transform(self):$/;"	m	class:Transformer
+reader	sxth.py	/^reader = sitk.ImageSeriesReader()$/;"	v
 recall	pytorch3dunet/unet3d/seg_metrics.py	/^def recall(tp, fp, fn):$/;"	f
 remove_halo	pytorch3dunet/unet3d/utils.py	/^def remove_halo(patch, index, shape, patch_halo):$/;"	f
 required_spec_kwargs	tests/test_bioimage-io/test_manifest.py	/^def required_spec_kwargs():$/;"	f
 save	pytorch3dunet/datasets/visualize.py	/^    def save(self, vol, seg, destination):$/;"	m	class:visualizer
 save_checkpoint	pytorch3dunet/unet3d/utils.py	/^def save_checkpoint(state, is_best, checkpoint_dir, logger=None):$/;"	f
 save_network_output	pytorch3dunet/unet3d/utils.py	/^def save_network_output(output_path, output, logger=None):$/;"	f
+save_predict_cases	pytorch3dunet/datasets/visualize.py	/^    def save_predict_cases(self, destination):$/;"	m	class:visualizer
+save_train_cases	pytorch3dunet/datasets/visualize.py	/^    def save_train_cases(self, destination):$/;"	m	class:visualizer
+seg	sxth.py	/^seg = sitk.ReadImage(seg_path)$/;"	v
+seg_array	sxth.py	/^seg_array = sitk.GetArrayFromImage(seg)$/;"	v
+seg_path	sxth.py	/^seg_path = '\/mnt\/sda2\/sxth_data\/ROI_T2\/2hrT2a_Merge.nii'$/;"	v
+set_phase	pytorch3dunet/datasets/sxth.py	/^    def set_phase( self, phase ):$/;"	m	class:SXTHCaseLoader
 should_stop	pytorch3dunet/unet3d/trainer.py	/^    def should_stop(self):$/;"	m	class:UNet3DTrainer
+sitk	pytorch3dunet/datasets/sxth.py	/^import SimpleITK as sitk$/;"	I
+sitk	sxth.py	/^import SimpleITK as sitk$/;"	I
 square_angular_loss	pytorch3dunet/unet3d/losses.py	/^def square_angular_loss(input, target, weights=None):$/;"	f
 target_to_seg	pytorch3dunet/unet3d/metrics.py	/^    def target_to_seg(self, target):$/;"	m	class:GenericAveragePrecision
 test_2d_unet	tests/test_trainer.py	/^    def test_2d_unet(self, tmpdir, capsys, train_config_2d):$/;"	m	class:TestUNet3DTrainer

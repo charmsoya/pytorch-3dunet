@@ -8,7 +8,8 @@ from pytorch3dunet.datasets.utils import get_test_loaders
 from pytorch3dunet.unet3d import utils
 from pytorch3dunet.unet3d.config import load_config
 from pytorch3dunet.unet3d.model import get_model
-
+from pytorch3dunet.datasets.visualize import visualizer
+import ipdb
 logger = utils.get_logger('UNet3DPredict')
 
 
@@ -47,7 +48,8 @@ def _get_predictor(model, loader, output_file, config):
 def main():
     # Load configuration
     config = load_config()
-
+    
+    
     # Create the model
     model = get_model(config)
 
@@ -77,7 +79,9 @@ def main():
         predictor = _get_predictor(model, test_loader, output_file, config)
         # run the model prediction on the entire dataset and save to the 'output_file' H5
         predictor.predict()
-
-
+    # visualiz mask to test images
+    vis = visualizer(  config.get('loaders')['test']['file_paths'][0], config.get('loaders')['output_dir'] )
+    vis.save_predict_cases(config.get('visualize_output_dir'))
+   
 if __name__ == '__main__':
     main()
